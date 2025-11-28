@@ -53,230 +53,101 @@ class ChemicalElementData:
 
 class ElementDataRepository:
     def __init__(self):
-        self.elements_collection = self._initialize_elements_collection()
+        self.elements_collection = self._load_elements_from_json()
     
-    def _initialize_elements_collection(self):
-        element_records = [
-            # Период 1
-            ("H", "Водород", 1, 1.008, 1, 1, "Неметаллы"),
-            ("He", "Гелий", 2, 4.0026, 18, 1, "Инертные газы"),
-            
-            # Период 2
-            ("Li", "Литий", 3, 6.94, 1, 2, "Щелочные металлы"),
-            ("Be", "Бериллий", 4, 9.0122, 2, 2, "Щелочноземельные металлы"),
-            ("B", "Бор", 5, 10.81, 13, 2, "Металлоиды"),
-            ("C", "Углерод", 6, 12.011, 14, 2, "Неметаллы"),
-            ("N", "Азот", 7, 14.007, 15, 2, "Неметаллы"),
-            ("O", "Кислород", 8, 15.999, 16, 2, "Неметаллы"),
-            ("F", "Фтор", 9, 18.998, 17, 2, "Галогены"),
-            ("Ne", "Неон", 10, 20.180, 18, 2, "Инертные газы"),
-            
-            # Период 3
-            ("Na", "Натрий", 11, 22.990, 1, 3, "Щелочные металлы"),
-            ("Mg", "Магний", 12, 24.305, 2, 3, "Щелочноземельные металлы"),
-            ("Al", "Алюминий", 13, 26.982, 13, 3, "Постпереходные металлы"),
-            ("Si", "Кремний", 14, 28.085, 14, 3, "Металлоиды"),
-            ("P", "Фосфор", 15, 30.974, 15, 3, "Неметаллы"),
-            ("S", "Сера", 16, 32.06, 16, 3, "Неметаллы"),
-            ("Cl", "Хлор", 17, 35.45, 17, 3, "Галогены"),
-            ("Ar", "Аргон", 18, 39.948, 18, 3, "Инертные газы"),
-            
-            # Период 4
-            ("K", "Калий", 19, 39.098, 1, 4, "Щелочные металлы"),
-            ("Ca", "Кальций", 20, 40.078, 2, 4, "Щелочноземельные металлы"),
-            ("Sc", "Скандий", 21, 44.956, 3, 4, "Переходные металлы"),
-            ("Ti", "Титан", 22, 47.867, 4, 4, "Переходные металлы"),
-            ("V", "Ванадий", 23, 50.942, 5, 4, "Переходные металлы"),
-            ("Cr", "Хром", 24, 51.996, 6, 4, "Переходные металлы"),
-            ("Mn", "Марганец", 25, 54.938, 7, 4, "Переходные металлы"),
-            ("Fe", "Железо", 26, 55.845, 8, 4, "Переходные металлы"),
-            ("Co", "Кобальт", 27, 58.933, 9, 4, "Переходные металлы"),
-            ("Ni", "Никель", 28, 58.693, 10, 4, "Переходные металлы"),
-            ("Cu", "Медь", 29, 63.546, 11, 4, "Переходные металлы"),
-            ("Zn", "Цинк", 30, 65.38, 12, 4, "Переходные металлы"),
-            ("Ga", "Галлий", 31, 69.723, 13, 4, "Постпереходные металлы"),
-            ("Ge", "Германий", 32, 72.630, 14, 4, "Металлоиды"),
-            ("As", "Мышьяк", 33, 74.922, 15, 4, "Металлоиды"),
-            ("Se", "Селен", 34, 78.971, 16, 4, "Неметаллы"),
-            ("Br", "Бром", 35, 79.904, 17, 4, "Галогены"),
-            ("Kr", "Криптон", 36, 83.798, 18, 4, "Инертные газы"),
-            
-            # Период 5
-            ("Rb", "Рубидий", 37, 85.468, 1, 5, "Щелочные металлы"),
-            ("Sr", "Стронций", 38, 87.62, 2, 5, "Щелочноземельные металлы"),
-            ("Y", "Иттрий", 39, 88.906, 3, 5, "Переходные металлы"),
-            ("Zr", "Цирконий", 40, 91.224, 4, 5, "Переходные металлы"),
-            ("Nb", "Ниобий", 41, 92.906, 5, 5, "Переходные металлы"),
-            ("Mo", "Молибден", 42, 95.95, 6, 5, "Переходные металлы"),
-            ("Tc", "Технеций", 43, 98, 7, 5, "Переходные металлы"),
-            ("Ru", "Рутений", 44, 101.07, 8, 5, "Переходные металлы"),
-            ("Rh", "Родий", 45, 102.91, 9, 5, "Переходные металлы"),
-            ("Pd", "Палладий", 46, 106.42, 10, 5, "Переходные металлы"),
-            ("Ag", "Серебро", 47, 107.87, 11, 5, "Переходные металлы"),
-            ("Cd", "Кадмий", 48, 112.41, 12, 5, "Переходные металлы"),
-            ("In", "Индий", 49, 114.82, 13, 5, "Постпереходные металлы"),
-            ("Sn", "Олово", 50, 118.71, 14, 5, "Постпереходные металлы"),
-            ("Sb", "Сурьма", 51, 121.76, 15, 5, "Металлоиды"),
-            ("Te", "Теллур", 52, 127.60, 16, 5, "Металлоиды"),
-            ("I", "Иод", 53, 126.90, 17, 5, "Галогены"),
-            ("Xe", "Ксенон", 54, 131.29, 18, 5, "Инертные газы"),
-            
-            # Период 6
-            ("Cs", "Цезий", 55, 132.91, 1, 6, "Щелочные металлы"),
-            ("Ba", "Барий", 56, 137.33, 2, 6, "Щелочноземельные металлы"),
-            ("La", "Лантан", 57, 138.91, 3, 6, "Лантаноиды"),
-            ("Ce", "Церий", 58, 140.12, 3, 6, "Лантаноиды"),
-            ("Pr", "Празеодим", 59, 140.91, 3, 6, "Лантаноиды"),
-            ("Nd", "Неодим", 60, 144.24, 3, 6, "Лантаноиды"),
-            ("Pm", "Прометий", 61, 145, 3, 6, "Лантаноиды"),
-            ("Sm", "Самарий", 62, 150.36, 3, 6, "Лантаноиды"),
-            ("Eu", "Европий", 63, 151.96, 3, 6, "Лантаноиды"),
-            ("Gd", "Гадолиний", 64, 157.25, 3, 6, "Лантаноиды"),
-            ("Tb", "Тербий", 65, 158.93, 3, 6, "Лантаноиды"),
-            ("Dy", "Диспрозий", 66, 162.50, 3, 6, "Лантаноиды"),
-            ("Ho", "Гольмий", 67, 164.93, 3, 6, "Лантаноиды"),
-            ("Er", "Эрбий", 68, 167.26, 3, 6, "Лантаноиды"),
-            ("Tm", "Тулий", 69, 168.93, 3, 6, "Лантаноиды"),
-            ("Yb", "Иттербий", 70, 173.05, 3, 6, "Лантаноиды"),
-            ("Lu", "Лютеций", 71, 174.97, 3, 6, "Лантаноиды"),
-            ("Hf", "Гафний", 72, 178.49, 4, 6, "Переходные металлы"),
-            ("Ta", "Тантал", 73, 180.95, 5, 6, "Переходные металлы"),
-            ("W", "Вольфрам", 74, 183.84, 6, 6, "Переходные металлы"),
-            ("Re", "Рений", 75, 186.21, 7, 6, "Переходные металлы"),
-            ("Os", "Осмий", 76, 190.23, 8, 6, "Переходные металлы"),
-            ("Ir", "Иридий", 77, 192.22, 9, 6, "Переходные металлы"),
-            ("Pt", "Платина", 78, 195.08, 10, 6, "Переходные металлы"),
-            ("Au", "Золото", 79, 196.97, 11, 6, "Переходные металлы"),
-            ("Hg", "Ртуть", 80, 200.59, 12, 6, "Переходные металлы"),
-            ("Tl", "Таллий", 81, 204.38, 13, 6, "Постпереходные металлы"),
-            ("Pb", "Свинец", 82, 207.2, 14, 6, "Постпереходные металлы"),
-            ("Bi", "Висмут", 83, 208.98, 15, 6, "Постпереходные металлы"),
-            ("Po", "Полоний", 84, 209, 16, 6, "Металлоиды"),
-            ("At", "Астат", 85, 210, 17, 6, "Галогены"),
-            ("Rn", "Радон", 86, 222, 18, 6, "Инертные газы"),
-            
-            # Период 7
-            ("Fr", "Франций", 87, 223, 1, 7, "Щелочные металлы"),
-            ("Ra", "Радий", 88, 226, 2, 7, "Щелочноземельные металлы"),
-            ("Ac", "Актиний", 89, 227, 3, 7, "Актиноиды"),
-            ("Th", "Торий", 90, 232.04, 3, 7, "Актиноиды"),
-            ("Pa", "Протактиний", 91, 231.04, 3, 7, "Актиноиды"),
-            ("U", "Уран", 92, 238.03, 3, 7, "Актиноиды"),
-            ("Np", "Нептуний", 93, 237, 3, 7, "Актиноиды"),
-            ("Pu", "Плутоний", 94, 244, 3, 7, "Актиноиды"),
-            ("Am", "Америций", 95, 243, 3, 7, "Актиноиды"),
-            ("Cm", "Кюрий", 96, 247, 3, 7, "Актиноиды"),
-            ("Bk", "Берклий", 97, 247, 3, 7, "Актиноиды"),
-            ("Cf", "Калифорний", 98, 251, 3, 7, "Актиноиды"),
-            ("Es", "Эйнштейний", 99, 252, 3, 7, "Актиноиды"),
-            ("Fm", "Фермий", 100, 257, 3, 7, "Актиноиды"),
-            ("Md", "Менделевий", 101, 258, 3, 7, "Актиноиды"),
-            ("No", "Нобелий", 102, 259, 3, 7, "Актиноиды"),
-            ("Lr", "Лоуренсий", 103, 266, 3, 7, "Актиноиды"),
-            ("Rf", "Резерфордий", 104, 267, 4, 7, "Переходные металлы"),
-            ("Db", "Дубний", 105, 268, 5, 7, "Переходные металлы"),
-            ("Sg", "Сиборгий", 106, 269, 6, 7, "Переходные металлы"),
-            ("Bh", "Борий", 107, 270, 7, 7, "Переходные металлы"),
-            ("Hs", "Хассий", 108, 269, 8, 7, "Переходные металлы"),
-            ("Mt", "Мейтнерий", 109, 278, 9, 7, "Переходные металлы"),
-            ("Ds", "Дармштадтий", 110, 281, 10, 7, "Переходные металлы"),
-            ("Rg", "Рентгений", 111, 282, 11, 7, "Переходные металлы"),
-            ("Cn", "Коперниций", 112, 285, 12, 7, "Переходные металлы"),
-            ("Nh", "Нихоний", 113, 286, 13, 7, "Постпереходные металлы"),
-            ("Fl", "Флеровий", 114, 289, 14, 7, "Постпереходные металлы"),
-            ("Mc", "Московий", 115, 290, 15, 7, "Постпереходные металлы"),
-            ("Lv", "Ливерморий", 116, 293, 16, 7, "Постпереходные металлы"),
-            ("Ts", "Теннессин", 117, 294, 17, 7, "Галогены"),
-            ("Og", "Оганесон", 118, 294, 18, 7, "Инертные газы")
-        ]
-        
-        chemical_elements = []
-        for record in element_records:
-            element = ChemicalElementData(*record)
-            self._enhance_element_data(element)
-            chemical_elements.append(element)
-        
-        return chemical_elements
+    def _get_data_path(self, filename):
+        """Получаем абсолютный путь к файлу в папке data"""
+        # Получаем директорию, где находится текущий скрипт
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # Поднимаемся на уровень выше (из src в ChemBrain) и идем в data
+        parent_dir = os.path.dirname(current_dir)
+        data_dir = os.path.join(parent_dir, 'data')
+        return os.path.join(data_dir, filename)
     
-    def _enhance_element_data(self, element):
-        properties = self._retrieve_element_properties(element.atomic_num)
-        element.configure_physical_properties(*properties[:5])
-        element.set_discovery_info(*properties[5:8])
-        element.set_additional_data(*properties[8:])
-    
-    def _retrieve_element_properties(self, atomic_number):
-        properties_database = {
-            1: ("1s¹", 2.20, -259.16, -252.87, 0.0000899, 1766, "Генри Кавендиш", 
-                "Самый легкий и распространенный элемент во Вселенной", 
-                ["Составляет 75% массы Вселенной", "Первый элемент после Большого взрыва"],
-                ["Производство аммиака", "Ракетное топливо", "Металлургия"]),
-            2: ("1s²", None, -272.2, -268.93, 0.0001785, 1868, "Пьер Жансен", 
-                "Второй по легкости элемент", 
-                ["Используется в воздухоплавании", "Негорючий газ"],
-                ["Дирижабли", "Криогеника", "Дыхательные смеси"]),
-            3: ("[He] 2s¹", 0.98, 180.5, 1342, 0.534, 1817, "Йохан Арфведсон",
-                "Щелочной металл",
-                ["Плавает на воде", "Самый легкий металл"],
-                ["Батареи", "Сплавы", "Психиатрия"]),
-            6: ("[He] 2s² 2p²", 2.55, 3550, 4827, 2.267, "Древность", "Древние",
-                "Основа органической химии",
-                ["Образует алмаз и графит", "Имеет множество аллотропов"],
-                ["Топливо", "Сталь", "Углеродные материалы"]),
-            7: ("[He] 2s² 2p³", 3.04, -210.1, -195.8, 0.001251, 1772, "Даниэль Резерфорд",
-                "Газ атмосферы",
-                ["Составляет 78% воздуха", "Не поддерживает горение"],
-                ["Удобрения", "Азотная кислота", "Промышленность"]),
-            8: ("[He] 2s² 2p⁴", 3.44, -218.8, -183, 0.001429, 1774, "Карл Шееле",
-                "Жизненно важный газ",
-                ["Самый распространенный элемент в земной коре", "Поддерживает горение"],
-                ["Дыхание", "Медицина", "Промышленность"]),
-            11: ("[Ne] 3s¹", 0.93, 97.72, 883, 0.968, 1807, "Хемфри Дэви",
-                 "Щелочной металл",
-                 ["Шестой по распространенности элемент", "Очень реакционноспособный"],
-                 ["Освещение", "Металлургия", "Производство мыла"]),
-            13: ("[Ne] 3s² 3p¹", 1.61, 660.32, 2519, 2.70, 1825, "Ханс Эрстед",
-                 "Легкий металл",
-                 ["Самый распространенный металл в земной коре", "Устойчив к коррозии"],
-                 ["Авиация", "Упаковка", "Электроника"]),
-            14: ("[Ne] 3s² 3p²", 1.90, 1414, 3265, 2.33, 1824, "Йёнс Якоб Берцелиус",
-                 "Полупроводник",
-                 ["Второй по распространенности элемент", "Основной компонент песка"],
-                 ["Электроника", "Стекло", "Солнечные панели"]),
-            17: ("[Ne] 3s² 3p⁵", 3.16, -101.5, -34.04, 0.003214, 1774, "Карл Шееле",
-                 "Желто-зеленый газ",
-                 ["Образует поваренную соль", "Сильный окислитель"],
-                 ["Дезинфекция", "Пластмассы", "Фармацевтика"]),
-            19: ("[Ar] 4s¹", 0.82, 63.5, 759, 0.856, 1807, "Хемфри Дэви",
-                 "Щелочной металл",
-                 ["Седьмой по распространенности элемент", "Важен для живых организмов"],
-                 ["Удобрения", "Медицина", "Пищевая промышленность"]),
-            20: ("[Ar] 4s²", 1.00, 842, 1484, 1.55, 1808, "Хемфри Дэви",
-                 "Щелочноземельный металл",
-                 ["Пятый по распространенности элемент", "Основа костей"],
-                 ["Строительство", "Медицина", "Производство цемента"]),
-            26: ("[Ar] 3d⁶ 4s²", 1.83, 1538, 2862, 7.87, "Древность", "Древние",
-                 "Важнейший металл",
-                 ["Второй по распространенности металл", "Основной компонент стали"],
-                 ["Машиностроение", "Строительство", "Транспорт"]),
-            29: ("[Ar] 3d¹⁰ 4s¹", 1.90, 1084.62, 2562, 8.96, "Древность", "Древние",
-                 "Цветной металл",
-                 ["Хороший проводник", "Первый металл, использованный человеком"],
-                 ["Электротехника", "Строительство", "Ювелирные изделия"]),
-            47: ("[Kr] 4d¹⁰ 5s¹", 1.93, 961.78, 2162, 10.49, "Древность", "Древние",
-                 "Благородный металл",
-                 ["Лучший проводник электричества", "Используется в фотографии"],
-                 ["Ювелирные изделия", "Электроника", "Медицина"]),
-            79: ("[Xe] 4f¹⁴ 5d¹⁰ 6s¹", 2.54, 1064.18, 2856, 19.32, "Древность", "Древние",
-                 "Благородный металл",
-                 ["Не окисляется на воздухе", "Самый ковкий металл"],
-                 ["Ювелирные изделия", "Электроника", "Финансы"]),
-        }
-        
-        default_properties = ("Неизвестно", "Неизвестно", "Неизвестно", "Неизвестно", 
-                             "Неизвестно", "Неизвестно", "Неизвестно", "Описание элемента",
-                             ["Интересный факт"], ["Применение элемента"])
-        
-        return properties_database.get(atomic_number, default_properties)
+    def _load_elements_from_json(self):
+        try:
+            # Создаем папку data, если она не существует
+            data_dir = os.path.dirname(self._get_data_path(''))
+            if not os.path.exists(data_dir):
+                os.makedirs(data_dir)
+                print(f"Создана папка: {data_dir}")
+            
+            # Загружаем основные данные элементов
+            elements_path = self._get_data_path('elements_data.json')
+            if not os.path.exists(elements_path):
+                print(f"Файл не найден: {elements_path}")
+                return []
+                
+            with open(elements_path, 'r', encoding='utf-8') as f:
+                elements_data = json.load(f)
+            
+            # Загружаем дополнительные свойства
+            properties_path = self._get_data_path('element_properties.json')
+            if not os.path.exists(properties_path):
+                print(f"Файл не найден: {properties_path}")
+                return []
+                
+            with open(properties_path, 'r', encoding='utf-8') as f:
+                properties_data = json.load(f)
+            
+            # Загружаем дополнительные факты и применения
+            additional_path = self._get_data_path('element_additional.json')
+            if not os.path.exists(additional_path):
+                print(f"Файл не найден: {additional_path}")
+                return []
+                
+            with open(additional_path, 'r', encoding='utf-8') as f:
+                additional_data = json.load(f)
+            
+            chemical_elements = []
+            
+            for element_dict in elements_data["elements"]:
+                # Создаем базовый объект элемента
+                element = ChemicalElementData(
+                    element_dict["symbol"],
+                    element_dict["name"],
+                    element_dict["atomic_number"],
+                    element_dict["atomic_weight"],
+                    element_dict["group"],
+                    element_dict["period"],
+                    element_dict["category"]
+                )
+                
+                # Загружаем дополнительные свойства
+                atomic_num_str = str(element.atomic_num)
+                props = properties_data["properties"].get(atomic_num_str, {})
+                additional = additional_data["additional_data"].get(atomic_num_str, {})
+                
+                # Настраиваем физические свойства
+                element.configure_physical_properties(
+                    props.get("electron_config", "Неизвестно"),
+                    props.get("electronegativity", "Неизвестно"),
+                    props.get("melting_point", "Неизвестно"),
+                    props.get("boiling_point", "Неизвестно"),
+                    props.get("density", "Неизвестно")
+                )
+                
+                # Настраиваем информацию об открытии
+                element.set_discovery_info(
+                    props.get("discovery_year", "Неизвестно"),
+                    props.get("discoverer", "Неизвестно"),
+                    props.get("description", "Описание элемента")
+                )
+                
+                # Настраиваем дополнительные данные
+                element.set_additional_data(
+                    additional.get("facts", ["Информация отсутствует"]),
+                    additional.get("uses", ["Информация отсутствует"])
+                )
+                
+                chemical_elements.append(element)
+            
+            print(f"Успешно загружено {len(chemical_elements)} элементов из JSON файлов")
+            return chemical_elements
+            
+        except Exception as e:
+            print(f"Ошибка загрузки данных из JSON: {e}")
+            return []
 
 class ElementInteractiveButton(QPushButton):
     def __init__(self, chemical_element, parent=None):
@@ -499,9 +370,11 @@ class PeriodicTableView(QWidget):
         self.info_header.setText(f"{element.full_name} ({element.symbol})")
     
     def _generate_detailed_information_html(self, element):
-        melting_temp = f"{element.melting_point}°C" if element.melting_point != "Неизвестно" else "Неизвестно"
-        boiling_temp = f"{element.boiling_point}°C" if element.boiling_point != "Неизвестно" else "Неизвестно"
-        electronegativity = f"{element.electronegativity_val}" if element.electronegativity_val != "Неизвестно" else "Неизвестно"
+        # Форматируем числовые значения
+        melting_temp = f"{element.melting_point}°C" if element.melting_point and element.melting_point != "Неизвестно" else "Неизвестно"
+        boiling_temp = f"{element.boiling_point}°C" if element.boiling_point and element.boiling_point != "Неизвестно" else "Неизвестно"
+        density_val = f"{element.density_val} г/см³" if element.density_val and element.density_val != "Неизвестно" else "Неизвестно"
+        electronegativity = f"{element.electronegativity_val}" if element.electronegativity_val and element.electronegativity_val != "Неизвестно" else "Неизвестно"
         
         html_content = f"""
         <div style="font-family: Arial; line-height: 1.6;">
@@ -521,7 +394,7 @@ class PeriodicTableView(QWidget):
                 <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Электроотрицательность:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{electronegativity}</td></tr>
                 <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Температура плавления:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{melting_temp}</td></tr>
                 <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Температура кипения:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{boiling_temp}</td></tr>
-                <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Плотность:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{element.density_val}</td></tr>
+                <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Плотность:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{density_val}</td></tr>
                 <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Год открытия:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{element.discovery_year}</td></tr>
                 <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Первооткрыватель:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{element.discoverer_info}</td></tr>
             </table>
@@ -819,6 +692,13 @@ class UserAccountManager:
         self.available_achievements = self._initialize_achievements()
         self.load_user_data()
     
+    def _get_data_path(self, filename):
+        """Получаем абсолютный путь к файлу в папке data"""
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(current_dir)
+        data_dir = os.path.join(parent_dir, 'data')
+        return os.path.join(data_dir, filename)
+    
     def _initialize_achievements(self):
         return [
             {'id': 1, 'name': 'Первые шаги', 'description': 'Пройти первую викторину'},
@@ -828,6 +708,35 @@ class UserAccountManager:
             {'id': 10, 'name': 'Менделеев нашего времени', 'description': 'Достичь 10 уровня'}
         ]
     
+    def save_user_data(self):
+        data_structure = {
+            'users': [user.convert_to_dictionary() for user in self.registered_users],
+            'achievements': self.available_achievements
+        }
+        try:
+            # Создаем папку data, если она не существует
+            data_dir = os.path.dirname(self._get_data_path(''))
+            if not os.path.exists(data_dir):
+                os.makedirs(data_dir)
+            
+            user_data_path = self._get_data_path('user_progress_data.json')
+            with open(user_data_path, 'w', encoding='utf-8') as file:
+                json.dump(data_structure, file, ensure_ascii=False, indent=2)
+        except Exception as error:
+            print(f"Ошибка сохранения данных: {error}")
+    
+    def load_user_data(self):
+        try:
+            user_data_path = self._get_data_path('user_progress_data.json')
+            if os.path.exists(user_data_path):
+                with open(user_data_path, 'r', encoding='utf-8') as file:
+                    loaded_data = json.load(file)
+                    self.registered_users = [StudyUser.create_from_dictionary(user_data) for user_data in loaded_data.get('users', [])]
+                    self.available_achievements = loaded_data.get('achievements', self.available_achievements)
+        except Exception as error:
+            print(f"Ошибка загрузки данных: {error}")
+    
+    # Остальные методы остаются без изменений...
     def register_new_user(self, username):
         if any(user.username == username for user in self.registered_users):
             return False, "Пользователь с таким именем уже существует"
@@ -847,27 +756,6 @@ class UserAccountManager:
     
     def user_logout(self):
         self.active_user = None
-    
-    def save_user_data(self):
-        data_structure = {
-            'users': [user.convert_to_dictionary() for user in self.registered_users],
-            'achievements': self.available_achievements
-        }
-        try:
-            with open('user_progress_data.json', 'w', encoding='utf-8') as file:
-                json.dump(data_structure, file, ensure_ascii=False, indent=2)
-        except Exception as error:
-            print(f"Ошибка сохранения данных: {error}")
-    
-    def load_user_data(self):
-        try:
-            if os.path.exists('user_progress_data.json'):
-                with open('user_progress_data.json', 'r', encoding='utf-8') as file:
-                    loaded_data = json.load(file)
-                    self.registered_users = [StudyUser.create_from_dictionary(user_data) for user_data in loaded_data.get('users', [])]
-                    self.available_achievements = loaded_data.get('achievements', self.available_achievements)
-        except Exception as error:
-            print(f"Ошибка загрузки данных: {error}")
     
     def evaluate_achievement_progress(self, quiz_data):
         if not self.active_user:
@@ -1477,8 +1365,6 @@ class ChemistryLearningApp(QMainWindow):
         user_info_panel = QHBoxLayout()
         self.user_information_display = QLabel("Не авторизован")
         user_info_panel.addWidget(self.user_information_display)
-        
-        # Удалена кнопка "Профиль"
         
         self.logout_action_button = QPushButton("Выйти")
         self.logout_action_button.clicked.connect(self.user_sign_out)

@@ -1,0 +1,1184 @@
+{
+  "properties": {
+    "1": {
+      "electron_config": "1s¹",
+      "electronegativity": "2.20",
+      "melting_point": "-259.16",
+      "boiling_point": "-252.87",
+      "density": "0.00008988",
+      "discovery_year": "1766",
+      "discoverer": "Генри Кавендиш",
+      "description": "Самый легкий и распространенный элемент во Вселенной"
+    },
+    "2": {
+      "electron_config": "1s²",
+      "electronegativity": "Нет данных",
+      "melting_point": "-272.20",
+      "boiling_point": "-268.93",
+      "density": "0.0001785",
+      "discovery_year": "1868",
+      "discoverer": "Пьер Жансен, Джозеф Норман Локьер",
+      "description": "Инертный газ, второй по легкости элемент"
+    },
+    "3": {
+      "electron_config": "[He] 2s¹",
+      "electronegativity": "0.98",
+      "melting_point": "180.50",
+      "boiling_point": "1342",
+      "density": "0.534",
+      "discovery_year": "1817",
+      "discoverer": "Йохан Август Арфведсон",
+      "description": "Щелочной металл, самый легкий металл"
+    },
+    "4": {
+      "electron_config": "[He] 2s²",
+      "electronegativity": "1.57",
+      "melting_point": "1287",
+      "boiling_point": "2470",
+      "density": "1.85",
+      "discovery_year": "1798",
+      "discoverer": "Луи Никола Воклен",
+      "description": "Щелочноземельный металл, используется в сплавах"
+    },
+    "5": {
+      "electron_config": "[He] 2s² 2p¹",
+      "electronegativity": "2.04",
+      "melting_point": "2076",
+      "boiling_point": "3927",
+      "density": "2.34",
+      "discovery_year": "1808",
+      "discoverer": "Джозеф Луи Гей-Люссак, Луи Жак Тенар",
+      "description": "Металлоид, важный компонент боратных минералов"
+    },
+    "6": {
+      "electron_config": "[He] 2s² 2p²",
+      "electronegativity": "2.55",
+      "melting_point": "3550",
+      "boiling_point": "4027",
+      "density": "2.267",
+      "discovery_year": "Древность",
+      "discoverer": "Известен с древности",
+      "description": "Основной элемент органической химии"
+    },
+    "7": {
+      "electron_config": "[He] 2s² 2p³",
+      "electronegativity": "3.04",
+      "melting_point": "-210.01",
+      "boiling_point": "-195.79",
+      "density": "0.001251",
+      "discovery_year": "1772",
+      "discoverer": "Даниэль Резерфорд",
+      "description": "Основной компонент атмосферы Земли"
+    },
+    "8": {
+      "electron_config": "[He] 2s² 2p⁴",
+      "electronegativity": "3.44",
+      "melting_point": "-218.79",
+      "boiling_point": "-182.96",
+      "density": "0.001429",
+      "discovery_year": "1774",
+      "discoverer": "Джозеф Пристли, Карл Шееле",
+      "description": "Наиболее распространенный элемент в земной коре"
+    },
+    "9": {
+      "electron_config": "[He] 2s² 2p⁵",
+      "electronegativity": "3.98",
+      "melting_point": "-219.67",
+      "boiling_point": "-188.11",
+      "density": "0.001696",
+      "discovery_year": "1886",
+      "discoverer": "Анри Муассан",
+      "description": "Самый электроотрицательный элемент"
+    },
+    "10": {
+      "electron_config": "[He] 2s² 2p⁶",
+      "electronegativity": "Нет данных",
+      "melting_point": "-248.59",
+      "boiling_point": "-246.08",
+      "density": "0.0008999",
+      "discovery_year": "1898",
+      "discoverer": "Уильям Рамзай, Моррис Траверс",
+      "description": "Инертный газ, используется в неоновых лампах"
+    },
+    "11": {
+      "electron_config": "[Ne] 3s¹",
+      "electronegativity": "0.93",
+      "melting_point": "97.72",
+      "boiling_point": "883",
+      "density": "0.968",
+      "discovery_year": "1807",
+      "discoverer": "Хэмфри Дэви",
+      "description": "Щелочной металл, шестой по распространенности элемент"
+    },
+    "12": {
+      "electron_config": "[Ne] 3s²",
+      "electronegativity": "1.31",
+      "melting_point": "650",
+      "boiling_point": "1090",
+      "density": "1.738",
+      "discovery_year": "1755",
+      "discoverer": "Джозеф Блэк",
+      "description": "Щелочноземельный металл, важный для живых организмов"
+    },
+    "13": {
+      "electron_config": "[Ne] 3s² 3p¹",
+      "electronegativity": "1.61",
+      "melting_point": "660.32",
+      "boiling_point": "2519",
+      "density": "2.698",
+      "discovery_year": "1825",
+      "discoverer": "Ханс Кристиан Эрстед",
+      "description": "Самый распространенный металл в земной коре"
+    },
+    "14": {
+      "electron_config": "[Ne] 3s² 3p²",
+      "electronegativity": "1.90",
+      "melting_point": "1414",
+      "boiling_point": "3265",
+      "density": "2.3296",
+      "discovery_year": "1824",
+      "discoverer": "Йёнс Якоб Берцелиус",
+      "description": "Второй по распространенности элемент в земной коре"
+    },
+    "15": {
+      "electron_config": "[Ne] 3s² 3p³",
+      "electronegativity": "2.19",
+      "melting_point": "44.15",
+      "boiling_point": "280.5",
+      "density": "1.82",
+      "discovery_year": "1669",
+      "discoverer": "Хенниг Бранд",
+      "description": "Важный элемент для жизни, компонент ДНК"
+    },
+    "16": {
+      "electron_config": "[Ne] 3s² 3p⁴",
+      "electronegativity": "2.58",
+      "melting_point": "115.21",
+      "boiling_point": "444.72",
+      "density": "2.067",
+      "discovery_year": "Древность",
+      "discoverer": "Известен с древности",
+      "description": "Жизненно важный элемент, компонент аминокислот"
+    },
+    "17": {
+      "electron_config": "[Ne] 3s² 3p⁵",
+      "electronegativity": "3.16",
+      "melting_point": "-101.5",
+      "boiling_point": "-34.04",
+      "density": "0.003214",
+      "discovery_year": "1774",
+      "discoverer": "Карл Вильгельм Шееле",
+      "description": "Галоген, важный для дезинфекции воды"
+    },
+    "18": {
+      "electron_config": "[Ne] 3s² 3p⁶",
+      "electronegativity": "Нет данных",
+      "melting_point": "-189.34",
+      "boiling_point": "-185.85",
+      "density": "0.0017837",
+      "discovery_year": "1894",
+      "discoverer": "Лорд Рэлей, Уильям Рамзай",
+      "description": "Инертный газ, третий по распространенности в атмосфере"
+    },
+    "19": {
+      "electron_config": "[Ar] 4s¹",
+      "electronegativity": "0.82",
+      "melting_point": "63.38",
+      "boiling_point": "759",
+      "density": "0.862",
+      "discovery_year": "1807",
+      "discoverer": "Хэмфри Дэви",
+      "description": "Щелочной металл, седьмой по распространенности элемент"
+    },
+    "20": {
+      "electron_config": "[Ar] 4s²",
+      "electronegativity": "1.00",
+      "melting_point": "842",
+      "boiling_point": "1484",
+      "density": "1.54",
+      "discovery_year": "1808",
+      "discoverer": "Хэмфри Дэви",
+      "description": "Щелочноземельный металл, важный для костей"
+    },
+    "21": {
+      "electron_config": "[Ar] 3d¹ 4s²",
+      "electronegativity": "1.36",
+      "melting_point": "1541",
+      "boiling_point": "2836",
+      "density": "2.989",
+      "discovery_year": "1879",
+      "discoverer": "Ларс Фредрик Нильсон",
+      "description": "Переходный металл, используется в алюминиевых сплавах"
+    },
+    "22": {
+      "electron_config": "[Ar] 3d² 4s²",
+      "electronegativity": "1.54",
+      "melting_point": "1668",
+      "boiling_point": "3287",
+      "density": "4.54",
+      "discovery_year": "1791",
+      "discoverer": "Уильям Грегор",
+      "description": "Прочный и легкий металл, устойчивый к коррозии"
+    },
+    "23": {
+      "electron_config": "[Ar] 3d³ 4s²",
+      "electronegativity": "1.63",
+      "melting_point": "1910",
+      "boiling_point": "3407",
+      "density": "6.11",
+      "discovery_year": "1801",
+      "discoverer": "Андрес Мануэль Дель Рио",
+      "description": "Твердый металл, используется в стальных сплавах"
+    },
+    "24": {
+      "electron_config": "[Ar] 3d⁵ 4s¹",
+      "electronegativity": "1.66",
+      "melting_point": "1907",
+      "boiling_point": "2671",
+      "density": "7.15",
+      "discovery_year": "1797",
+      "discoverer": "Луи Никола Воклен",
+      "description": "Твердый металл, используется для хромирования"
+    },
+    "25": {
+      "electron_config": "[Ar] 3d⁵ 4s²",
+      "electronegativity": "1.55",
+      "melting_point": "1246",
+      "boiling_point": "2061",
+      "density": "7.44",
+      "discovery_year": "1774",
+      "discoverer": "Йохан Готлиб Ган",
+      "description": "Важный компонент сталей и батарей"
+    },
+    "26": {
+      "electron_config": "[Ar] 3d⁶ 4s²",
+      "electronegativity": "1.83",
+      "melting_point": "1538",
+      "boiling_point": "2862",
+      "density": "7.874",
+      "discovery_year": "Древность",
+      "discoverer": "Известен с древности",
+      "description": "Самый распространенный металл на Земле"
+    },
+    "27": {
+      "electron_config": "[Ar] 3d⁷ 4s²",
+      "electronegativity": "1.88",
+      "melting_point": "1495",
+      "boiling_point": "2927",
+      "density": "8.86",
+      "discovery_year": "1735",
+      "discoverer": "Георг Брандт",
+      "description": "Используется в магнитах и жаропрочных сплавах"
+    },
+    "28": {
+      "electron_config": "[Ar] 3d⁸ 4s²",
+      "electronegativity": "1.91",
+      "melting_point": "1455",
+      "boiling_point": "2913",
+      "density": "8.912",
+      "discovery_year": "1751",
+      "discoverer": "Аксель Фредрик Кронштедт",
+      "description": "Коррозионностойкий металл, используется в сплавах"
+    },
+    "29": {
+      "electron_config": "[Ar] 3d¹⁰ 4s¹",
+      "electronegativity": "1.90",
+      "melting_point": "1084.62",
+      "boiling_point": "2562",
+      "density": "8.96",
+      "discovery_year": "Древность",
+      "discoverer": "Известен с древности",
+      "description": "Металл с высокой электропроводностью"
+    },
+    "30": {
+      "electron_config": "[Ar] 3d¹⁰ 4s²",
+      "electronegativity": "1.65",
+      "melting_point": "419.53",
+      "boiling_point": "907",
+      "density": "7.134",
+      "discovery_year": "1746",
+      "discoverer": "Андреас Маргграф",
+      "description": "Голубовато-белый металл, защищает сталь от коррозии"
+    },
+    "31": {
+      "electron_config": "[Ar] 3d¹⁰ 4s² 4p¹",
+      "electronegativity": "1.81",
+      "melting_point": "29.76",
+      "boiling_point": "2204",
+      "density": "5.907",
+      "discovery_year": "1875",
+      "discoverer": "Поль Эмиль Лекок де Буабодран",
+      "description": "Металл с низкой температурой плавления"
+    },
+    "32": {
+      "electron_config": "[Ar] 3d¹⁰ 4s² 4p²",
+      "electronegativity": "2.01",
+      "melting_point": "938.25",
+      "boiling_point": "2833",
+      "density": "5.323",
+      "discovery_year": "1886",
+      "discoverer": "Клеменс Винклер",
+      "description": "Полупроводник, важный для электроники"
+    },
+    "33": {
+      "electron_config": "[Ar] 3d¹⁰ 4s² 4p³",
+      "electronegativity": "2.18",
+      "melting_point": "817",
+      "boiling_point": "613",
+      "density": "5.776",
+      "discovery_year": "1250",
+      "discoverer": "Альберт Великий",
+      "description": "Токсичный металлоид, известный с древности"
+    },
+    "34": {
+      "electron_config": "[Ar] 3d¹⁰ 4s² 4p⁴",
+      "electronegativity": "2.55",
+      "melting_point": "221",
+      "boiling_point": "685",
+      "density": "4.809",
+      "discovery_year": "1817",
+      "discoverer": "Йёнс Якоб Берцелиус",
+      "description": "Эссенциальный микроэлемент для живых организмов"
+    },
+    "35": {
+      "electron_config": "[Ar] 3d¹⁰ 4s² 4p⁵",
+      "electronegativity": "2.96",
+      "melting_point": "-7.2",
+      "boiling_point": "58.8",
+      "density": "3.122",
+      "discovery_year": "1826",
+      "discoverer": "Антуан Жером Балар",
+      "description": "Единственный жидкий неметалл при комнатной температуре"
+    },
+    "36": {
+      "electron_config": "[Ar] 3d¹⁰ 4s² 4p⁶",
+      "electronegativity": "3.00",
+      "melting_point": "-157.36",
+      "boiling_point": "-153.22",
+      "density": "0.003733",
+      "discovery_year": "1898",
+      "discoverer": "Уильям Рамзай, Моррис Траверс",
+      "description": "Инертный газ, используется в освещении"
+    },
+    "37": {
+      "electron_config": "[Kr] 5s¹",
+      "electronegativity": "0.82",
+      "melting_point": "39.31",
+      "boiling_point": "688",
+      "density": "1.532",
+      "discovery_year": "1861",
+      "discoverer": "Роберт Бунзен, Густав Кирхгоф",
+      "description": "Очень мягкий щелочной металл"
+    },
+    "38": {
+      "electron_config": "[Kr] 5s²",
+      "electronegativity": "0.95",
+      "melting_point": "777",
+      "boiling_point": "1377",
+      "density": "2.64",
+      "discovery_year": "1790",
+      "discoverer": "Адер Кроуфорд",
+      "description": "Щелочноземельный металл, дает красный цвет в фейерверках"
+    },
+    "39": {
+      "electron_config": "[Kr] 4d¹ 5s²",
+      "electronegativity": "1.22",
+      "melting_point": "1526",
+      "boiling_point": "3345",
+      "density": "4.469",
+      "discovery_year": "1794",
+      "discoverer": "Юхан Гадолин",
+      "description": "Редкоземельный металл, используется в лазерах"
+    },
+    "40": {
+      "electron_config": "[Kr] 4d² 5s²",
+      "electronegativity": "1.33",
+      "melting_point": "1855",
+      "boiling_point": "4409",
+      "density": "6.506",
+      "discovery_year": "1789",
+      "discoverer": "Мартин Генрих Клапрот",
+      "description": "Коррозионностойкий металл, используется в ядерных реакторах"
+    },
+    "41": {
+      "electron_config": "[Kr] 4d⁴ 5s¹",
+      "electronegativity": "1.6",
+      "melting_point": "2477",
+      "boiling_point": "4744",
+      "density": "8.57",
+      "discovery_year": "1801",
+      "discoverer": "Чарльз Хэтчетт",
+      "description": "Тугоплавкий металл, используется в сверхпроводниках"
+    },
+    "42": {
+      "electron_config": "[Kr] 4d⁵ 5s¹",
+      "electronegativity": "2.16",
+      "melting_point": "2623",
+      "boiling_point": "4639",
+      "density": "10.22",
+      "discovery_year": "1778",
+      "discoverer": "Карл Вильгельм Шееле",
+      "description": "Тугоплавкий металл, важный для сталей"
+    },
+    "43": {
+      "electron_config": "[Kr] 4d⁵ 5s²",
+      "electronegativity": "1.9",
+      "melting_point": "2157",
+      "boiling_point": "4265",
+      "density": "11.5",
+      "discovery_year": "1937",
+      "discoverer": "Карло Перрье, Эмилио Сегре",
+      "description": "Первый искусственно созданный элемент"
+    },
+    "44": {
+      "electron_config": "[Kr] 4d⁷ 5s¹",
+      "electronegativity": "2.2",
+      "melting_point": "2334",
+      "boiling_point": "4150",
+      "density": "12.37",
+      "discovery_year": "1844",
+      "discoverer": "Карл Эрнст Клаус",
+      "description": "Редкий металл платиновой группы"
+    },
+    "45": {
+      "electron_config": "[Kr] 4d⁸ 5s¹",
+      "electronegativity": "2.28",
+      "melting_point": "1964",
+      "boiling_point": "3695",
+      "density": "12.41",
+      "discovery_year": "1803",
+      "discoverer": "Уильям Хайд Волластон",
+      "description": "Редкий металл, самый дорогой из платиновой группы"
+    },
+    "46": {
+      "electron_config": "[Kr] 4d¹⁰",
+      "electronegativity": "2.20",
+      "melting_point": "1554.9",
+      "boiling_point": "2963",
+      "density": "12.02",
+      "discovery_year": "1803",
+      "discoverer": "Уильям Хайд Волластон",
+      "description": "Металл платиновой группы, катализатор"
+    },
+    "47": {
+      "electron_config": "[Kr] 4d¹⁰ 5s¹",
+      "electronegativity": "1.93",
+      "melting_point": "961.78",
+      "boiling_point": "2162",
+      "density": "10.49",
+      "discovery_year": "Древность",
+      "discoverer": "Известен с древности",
+      "description": "Металл с самой высокой электропроводностью"
+    },
+    "48": {
+      "electron_config": "[Kr] 4d¹⁰ 5s²",
+      "electronegativity": "1.69",
+      "melting_point": "321.07",
+      "boiling_point": "767",
+      "density": "8.69",
+      "discovery_year": "1817",
+      "discoverer": "Фридрих Штромейер",
+      "description": "Токсичный металл, используется в батареях"
+    },
+    "49": {
+      "electron_config": "[Kr] 4d¹⁰ 5s² 5p¹",
+      "electronegativity": "1.78",
+      "melting_point": "156.60",
+      "boiling_point": "2072",
+      "density": "7.31",
+      "discovery_year": "1863",
+      "discoverer": "Фердинанд Райх, Иероним Теодор Рихтер",
+      "description": "Мягкий металл, используется в полупроводниках"
+    },
+    "50": {
+      "electron_config": "[Kr] 4d¹⁰ 5s² 5p²",
+      "electronegativity": "1.96",
+      "melting_point": "231.93",
+      "boiling_point": "2602",
+      "density": "7.287",
+      "discovery_year": "Древность",
+      "discoverer": "Известен с древности",
+      "description": "Металл, известный с бронзового века"
+    },
+    "51": {
+      "electron_config": "[Kr] 4d¹⁰ 5s² 5p³",
+      "electronegativity": "2.05",
+      "melting_point": "630.63",
+      "boiling_point": "1587",
+      "density": "6.685",
+      "discovery_year": "Древность",
+      "discoverer": "Известен с древности",
+      "description": "Металлоид, известный с древних времен"
+    },
+    "52": {
+      "electron_config": "[Kr] 4d¹⁰ 5s² 5p⁴",
+      "electronegativity": "2.1",
+      "melting_point": "449.51",
+      "boiling_point": "988",
+      "density": "6.232",
+      "discovery_year": "1782",
+      "discoverer": "Франц-Йозеф Мюллер фон Райхенштейн",
+      "description": "Металлоид, похожий на селен и серу"
+    },
+    "53": {
+      "electron_config": "[Kr] 4d¹⁰ 5s² 5p⁵",
+      "electronegativity": "2.66",
+      "melting_point": "113.7",
+      "boiling_point": "184.3",
+      "density": "4.93",
+      "discovery_year": "1811",
+      "discoverer": "Бернар Куртуа",
+      "description": "Галоген, важный для щитовидной железы"
+    },
+    "54": {
+      "electron_config": "[Kr] 4d¹⁰ 5s² 5p⁶",
+      "electronegativity": "2.6",
+      "melting_point": "-111.75",
+      "boiling_point": "-108.0",
+      "density": "0.005887",
+      "discovery_year": "1898",
+      "discoverer": "Уильям Рамзай, Моррис Траверс",
+      "description": "Инертный газ, используется в лампах и анестезии"
+    },
+    "55": {
+      "electron_config": "[Xe] 6s¹",
+      "electronegativity": "0.79",
+      "melting_point": "28.44",
+      "boiling_point": "671",
+      "density": "1.873",
+      "discovery_year": "1860",
+      "discoverer": "Роберт Бунзен, Густав Кирхгоф",
+      "description": "Самый электроположительный стабильный элемент"
+    },
+    "56": {
+      "electron_config": "[Xe] 6s²",
+      "electronegativity": "0.89",
+      "melting_point": "727",
+      "boiling_point": "1870",
+      "density": "3.51",
+      "discovery_year": "1808",
+      "discoverer": "Хэмфри Дэви",
+      "description": "Щелочноземельный металл, дает зеленый цвет в фейерверках"
+    },
+    "57": {
+      "electron_config": "[Xe] 5d¹ 6s²",
+      "electronegativity": "1.1",
+      "melting_point": "920",
+      "boiling_point": "3464",
+      "density": "6.162",
+      "discovery_year": "1839",
+      "discoverer": "Карл Густав Мосандер",
+      "description": "Первый элемент в группе лантаноидов"
+    },
+    "58": {
+      "electron_config": "[Xe] 4f¹ 5d¹ 6s²",
+      "electronegativity": "1.12",
+      "melting_point": "795",
+      "boiling_point": "3443",
+      "density": "6.770",
+      "discovery_year": "1803",
+      "discoverer": "Йёнс Якоб Берцелиус, Вильгельм Хизингер",
+      "description": "Самый распространенный редкоземельный элемент"
+    },
+    "59": {
+      "electron_config": "[Xe] 4f³ 6s²",
+      "electronegativity": "1.13",
+      "melting_point": "935",
+      "boiling_point": "3520",
+      "density": "6.773",
+      "discovery_year": "1885",
+      "discoverer": "Карл Ауэр фон Вельсбах",
+      "description": "Редкоземельный металл, используется в магнитах"
+    },
+    "60": {
+      "electron_config": "[Xe] 4f⁴ 6s²",
+      "electronegativity": "1.14",
+      "melting_point": "1024",
+      "boiling_point": "3074",
+      "density": "7.007",
+      "discovery_year": "1885",
+      "discoverer": "Карл Ауэр фон Вельсбах",
+      "description": "Редкоземельный металл, используется в мощных магнитах"
+    },
+    "61": {
+      "electron_config": "[Xe] 4f⁵ 6s²",
+      "electronegativity": "1.13",
+      "melting_point": "1042",
+      "boiling_point": "3000",
+      "density": "7.26",
+      "discovery_year": "1945",
+      "discoverer": "Джекоб А. Марински, Лоуренс Э. Гленденин",
+      "description": "Радиоактивный редкоземельный элемент"
+    },
+    "62": {
+      "electron_config": "[Xe] 4f⁶ 6s²",
+      "electronegativity": "1.17",
+      "melting_point": "1072",
+      "boiling_point": "1900",
+      "density": "7.52",
+      "discovery_year": "1853",
+      "discoverer": "Жан Шарль Галиссар де Мариньяк",
+      "description": "Редкоземельный металл, поглощает нейтроны"
+    },
+    "63": {
+      "electron_config": "[Xe] 4f⁷ 6s²",
+      "electronegativity": "1.2",
+      "melting_point": "822",
+      "boiling_point": "1529",
+      "density": "5.244",
+      "discovery_year": "1901",
+      "discoverer": "Эжен-Анатоль Демарсе",
+      "description": "Редкоземельный металл, используется в люминофорах"
+    },
+    "64": {
+      "electron_config": "[Xe] 4f⁷ 5d¹ 6s²",
+      "electronegativity": "1.2",
+      "melting_point": "1312",
+      "boiling_point": "3273",
+      "density": "7.895",
+      "discovery_year": "1880",
+      "discoverer": "Жан Шарль Галиссар де Мариньяк",
+      "description": "Редкоземельный металл с высоким сечением захвата нейтронов"
+    },
+    "65": {
+      "electron_config": "[Xe] 4f⁹ 6s²",
+      "electronegativity": "1.2",
+      "melting_point": "1356",
+      "boiling_point": "3230",
+      "density": "8.229",
+      "discovery_year": "1843",
+      "discoverer": "Карл Густав Мосандер",
+      "description": "Редкоземельный металл, используется в лазерах"
+    },
+    "66": {
+      "electron_config": "[Xe] 4f¹⁰ 6s²",
+      "electronegativity": "1.22",
+      "melting_point": "1412",
+      "boiling_point": "2567",
+      "density": "8.55",
+      "discovery_year": "1886",
+      "discoverer": "Поль Эмиль Лекок де Буабодран",
+      "description": "Редкоземельный металл, используется в магнитах"
+    },
+    "67": {
+      "electron_config": "[Xe] 4f¹¹ 6s²",
+      "electronegativity": "1.23",
+      "melting_point": "1470",
+      "boiling_point": "2720",
+      "density": "8.795",
+      "discovery_year": "1878",
+      "discoverer": "Марк Делафонтен, Жак-Луи Соре",
+      "description": "Редкоземельный металл, самый магнитный элемент"
+    },
+    "68": {
+      "electron_config": "[Xe] 4f¹² 6s²",
+      "electronegativity": "1.24",
+      "melting_point": "1529",
+      "boiling_point": "2868",
+      "density": "9.066",
+      "discovery_year": "1842",
+      "discoverer": "Карл Густав Мосандер",
+      "description": "Редкоземельный металл, используется в оптических волокнах"
+    },
+    "69": {
+      "electron_config": "[Xe] 4f¹³ 6s²",
+      "electronegativity": "1.25",
+      "melting_point": "1545",
+      "boiling_point": "1950",
+      "density": "9.321",
+      "discovery_year": "1879",
+      "discoverer": "Пер Теодор Клеве",
+      "description": "Самый редкий из стабильных редкоземельных элементов"
+    },
+    "70": {
+      "electron_config": "[Xe] 4f¹⁴ 6s²",
+      "electronegativity": "1.1",
+      "melting_point": "819",
+      "boiling_point": "1196",
+      "density": "6.965",
+      "discovery_year": "1878",
+      "discoverer": "Жан Шарль Галиссар де Мариньяк",
+      "description": "Редкоземельный металл, используется в сталях"
+    },
+    "71": {
+      "electron_config": "[Xe] 4f¹⁴ 5d¹ 6s²",
+      "electronegativity": "1.27",
+      "melting_point": "1663",
+      "boiling_point": "3402",
+      "density": "9.841",
+      "discovery_year": "1907",
+      "discoverer": "Жорж Урбен, Карл Ауэр фон Вельсбах",
+      "description": "Последний элемент в группе лантаноидов"
+    },
+    "72": {
+      "electron_config": "[Xe] 4f¹⁴ 5d² 6s²",
+      "electronegativity": "1.3",
+      "melting_point": "2233",
+      "boiling_point": "4603",
+      "density": "13.31",
+      "discovery_year": "1923",
+      "discoverer": "Дирк Костер, Дьёрдь де Хевеши",
+      "description": "Тугоплавкий металл, используется в ядерных реакторах"
+    },
+    "73": {
+      "electron_config": "[Xe] 4f¹⁴ 5d³ 6s²",
+      "electronegativity": "1.5",
+      "melting_point": "3017",
+      "boiling_point": "5458",
+      "density": "16.654",
+      "discovery_year": "1802",
+      "discoverer": "Андерс Густав Экеберг",
+      "description": "Очень тугоплавкий и коррозионностойкий металл"
+    },
+    "74": {
+      "electron_config": "[Xe] 4f¹⁴ 5d⁴ 6s²",
+      "electronegativity": "2.36",
+      "melting_point": "3422",
+      "boiling_point": "5555",
+      "density": "19.25",
+      "discovery_year": "1783",
+      "discoverer": "Хуан Хосе Эльхуяр, Фаусто Эльхуяр",
+      "description": "Металл с самой высокой температурой плавления"
+    },
+    "75": {
+      "electron_config": "[Xe] 4f¹⁴ 5d⁵ 6s²",
+      "electronegativity": "1.9",
+      "melting_point": "3186",
+      "boiling_point": "5596",
+      "density": "21.02",
+      "discovery_year": "1925",
+      "discoverer": "Вальтер Ноддак, Ида Ноддак",
+      "description": "Один из самых плотных и тугоплавких металлов"
+    },
+    "76": {
+      "electron_config": "[Xe] 4f¹⁴ 5d⁶ 6s²",
+      "electronegativity": "2.2",
+      "melting_point": "3033",
+      "boiling_point": "5012",
+      "density": "22.59",
+      "discovery_year": "1803",
+      "discoverer": "Смитсон Теннант",
+      "description": "Самый плотный природный элемент"
+    },
+    "77": {
+      "electron_config": "[Xe] 4f¹⁴ 5d⁷ 6s²",
+      "electronegativity": "2.20",
+      "melting_point": "2446",
+      "boiling_point": "4428",
+      "density": "22.56",
+      "discovery_year": "1803",
+      "discoverer": "Смитсон Теннант",
+      "description": "Очень плотный и коррозионностойкий металл"
+    },
+    "78": {
+      "electron_config": "[Xe] 4f¹⁴ 5d⁹ 6s¹",
+      "electronegativity": "2.28",
+      "melting_point": "1768.3",
+      "boiling_point": "3825",
+      "density": "21.46",
+      "discovery_year": "Древность",
+      "discoverer": "Известен с древности",
+      "description": "Драгоценный металл, используется в ювелирных изделиях"
+    },
+    "79": {
+      "electron_config": "[Xe] 4f¹⁴ 5d¹⁰ 6s¹",
+      "electronegativity": "2.54",
+      "melting_point": "1064.18",
+      "boiling_point": "2856",
+      "density": "19.282",
+      "discovery_year": "Древность",
+      "discoverer": "Известен с древности",
+      "description": "Благородный металл, символ богатства"
+    },
+    "80": {
+      "electron_config": "[Xe] 4f¹⁴ 5d¹⁰ 6s²",
+      "electronegativity": "2.00",
+      "melting_point": "-38.83",
+      "boiling_point": "356.73",
+      "density": "13.5336",
+      "discovery_year": "Древность",
+      "discoverer": "Известен с древности",
+      "description": "Единственный металл, жидкий при комнатной температуре"
+    },
+    "81": {
+      "electron_config": "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹",
+      "electronegativity": "1.62",
+      "melting_point": "304",
+      "boiling_point": "1473",
+      "density": "11.85",
+      "discovery_year": "1861",
+      "discoverer": "Уильям Крукс",
+      "description": "Очень токсичный мягкий металл"
+    },
+    "82": {
+      "electron_config": "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²",
+      "electronegativity": "2.33",
+      "melting_point": "327.46",
+      "boiling_point": "1749",
+      "density": "11.34",
+      "discovery_year": "Древность",
+      "discoverer": "Известен с древности",
+      "description": "Тяжелый металл, использовался в древности"
+    },
+    "83": {
+      "electron_config": "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³",
+      "electronegativity": "2.02",
+      "melting_point": "271.5",
+      "boiling_point": "1564",
+      "density": "9.78",
+      "discovery_year": "Древность",
+      "discoverer": "Известен с древности",
+      "description": "Самый тяжелый стабильный элемент"
+    },
+    "84": {
+      "electron_config": "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴",
+      "electronegativity": "2.0",
+      "melting_point": "254",
+      "boiling_point": "962",
+      "density": "9.196",
+      "discovery_year": "1898",
+      "discoverer": "Мария Кюри, Пьер Кюри",
+      "description": "Радиоактивный элемент, первый открытый радионуклид"
+    },
+    "85": {
+      "electron_config": "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵",
+      "electronegativity": "2.2",
+      "melting_point": "302",
+      "boiling_point": "337",
+      "density": "7",
+      "discovery_year": "1940",
+      "discoverer": "Дейл Р. Корсон, Кеннет Росс Маккензи, Эмилио Сегре",
+      "description": "Самый редкий природный элемент на Земле"
+    },
+    "86": {
+      "electron_config": "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶",
+      "electronegativity": "2.2",
+      "melting_point": "-71",
+      "boiling_point": "-61.7",
+      "density": "0.00973",
+      "discovery_year": "1900",
+      "discoverer": "Фридрих Эрнст Дорн",
+      "description": "Радиоактивный инертный газ"
+    },
+    "87": {
+      "electron_config": "[Rn] 7s¹",
+      "electronegativity": "0.7",
+      "melting_point": "27",
+      "boiling_point": "677",
+      "density": "1.87",
+      "discovery_year": "1939",
+      "discoverer": "Маргарита Перей",
+      "description": "Второй самый редкий природный элемент"
+    },
+    "88": {
+      "electron_config": "[Rn] 7s²",
+      "electronegativity": "0.9",
+      "melting_point": "700",
+      "boiling_point": "1737",
+      "density": "5.5",
+      "discovery_year": "1898",
+      "discoverer": "Мария Кюри, Пьер Кюри",
+      "description": "Высокорадиоактивный щелочноземельный металл"
+    },
+    "89": {
+      "electron_config": "[Rn] 6d¹ 7s²",
+      "electronegativity": "1.1",
+      "melting_point": "1050",
+      "boiling_point": "3200",
+      "density": "10.07",
+      "discovery_year": "1899",
+      "discoverer": "Андре-Луи Дебьерн",
+      "description": "Первый элемент в группе актиноидов"
+    },
+    "90": {
+      "electron_config": "[Rn] 6d² 7s²",
+      "electronegativity": "1.3",
+      "melting_point": "1750",
+      "boiling_point": "4788",
+      "density": "11.72",
+      "discovery_year": "1828",
+      "discoverer": "Йёнс Якоб Берцелиус",
+      "description": "Слаборадиоактивный металл, используется в ядерной энергетике"
+    },
+    "91": {
+      "electron_config": "[Rn] 5f² 6d¹ 7s²",
+      "electronegativity": "1.5",
+      "melting_point": "1572",
+      "boiling_point": "4000",
+      "density": "15.37",
+      "discovery_year": "1913",
+      "discoverer": "Казимир Фаянс, Освальд Хельмут Геринг",
+      "description": "Радиоактивный металл, встречается в урановых рудах"
+    },
+    "92": {
+      "electron_config": "[Rn] 5f³ 6d¹ 7s²",
+      "electronegativity": "1.38",
+      "melting_point": "1132.2",
+      "boiling_point": "4131",
+      "density": "19.1",
+      "discovery_year": "1789",
+      "discoverer": "Мартин Клапрот",
+      "description": "Радиоактивный элемент, используется в ядерной энергетике"
+    },
+    "93": {
+      "electron_config": "[Rn] 5f⁴ 6d¹ 7s²",
+      "electronegativity": "1.36",
+      "melting_point": "637",
+      "boiling_point": "4000",
+      "density": "20.45",
+      "discovery_year": "1940",
+      "discoverer": "Эдвин Макмиллан, Филипп Абельсон",
+      "description": "Первый искусственно полученный трансурановый элемент"
+    },
+    "94": {
+      "electron_config": "[Rn] 5f⁶ 7s²",
+      "electroneгativity": "1.28",
+      "melting_point": "639.4",
+      "boiling_point": "3228",
+      "density": "19.84",
+      "discovery_year": "1940",
+      "discoverer": "Гленн Сиборг, Эдвин Макмиллан",
+      "description": "Используется в ядерном оружии и реакторах"
+    },
+    "95": {
+      "electron_config": "[Rn] 5f⁷ 7s²",
+      "electronegativity": "1.3",
+      "melting_point": "1176",
+      "boiling_point": "2011",
+      "density": "13.69",
+      "discovery_year": "1944",
+      "discoverer": "Гленн Сиборг, Ральф Джеймс, Лео Морган, Альберт Гиорсо",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "96": {
+      "electron_config": "[Rn] 5f⁷ 6d¹ 7s²",
+      "electronegativity": "1.3",
+      "melting_point": "1340",
+      "boiling_point": "3110",
+      "density": "13.51",
+      "discovery_year": "1944",
+      "discoverer": "Гленн Сиборг, Ральф Джеймс, Альберт Гиорсо",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "97": {
+      "electron_config": "[Rn] 5f⁹ 7s²",
+      "electronegativity": "1.3",
+      "melting_point": "986",
+      "boiling_point": "2627",
+      "density": "14.79",
+      "discovery_year": "1949",
+      "discoverer": "Гленн Сиборг, Альберт Гиорсо, Стэнли Томпсон",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "98": {
+      "electron_config": "[Rn] 5f¹⁰ 7s²",
+      "electronegativity": "1.3",
+      "melting_point": "900",
+      "boiling_point": "1470",
+      "density": "15.1",
+      "discovery_year": "1950",
+      "discoverer": "Гленн Сиборг, Альберт Гиорсо, Стэнли Томпсон, Кеннет Стрит",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "99": {
+      "electron_config": "[Rn] 5f¹¹ 7s²",
+      "electronegativity": "1.3",
+      "melting_point": "860",
+      "boiling_point": "996",
+      "density": "8.84",
+      "discovery_year": "1952",
+      "discoverer": "Гленн Сиборг, Альберт Гиорсо",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "100": {
+      "electron_config": "[Rn] 5f¹² 7s²",
+      "electronegativity": "1.3",
+      "melting_point": "1527",
+      "boiling_point": "Нет данных",
+      "density": "9.7",
+      "discovery_year": "1952",
+      "discoverer": "Гленн Сиборг, Альберт Гиорсо",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "101": {
+      "electron_config": "[Rn] 5f¹³ 7s²",
+      "electronegativity": "1.3",
+      "melting_point": "827",
+      "boiling_point": "Нет данных",
+      "density": "10.3",
+      "discovery_year": "1955",
+      "discoverer": "Гленн Сиборг, Альберт Гиорсо, Бернард Харви, Грегори Чоппин",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "102": {
+      "electron_config": "[Rn] 5f¹⁴ 7s²",
+      "electronegativity": "1.3",
+      "melting_point": "827",
+      "boiling_point": "Нет данных",
+      "density": "9.9",
+      "discovery_year": "1958",
+      "discoverer": "Альберт Гиорсо, Гленн Сиборг, Джон Уолгрен, Торбьёрн Сиккеланд",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "103": {
+      "electron_config": "[Rn] 5f¹⁴ 6d¹ 7s²",
+      "electronegativity": "1.3",
+      "melting_point": "1627",
+      "boiling_point": "Нет данных",
+      "density": "15.6",
+      "discovery_year": "1961",
+      "discoverer": "Альберт Гиорсо, Торбьёрн Сиккеланд, Алайн Е. Ларш, Роберт М. Латимер",
+      "description": "Последний элемент в группе актиноидов"
+    },
+    "104": {
+      "electron_config": "[Rn] 5f¹⁴ 6d² 7s²",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "23.2",
+      "discovery_year": "1964",
+      "discoverer": "Георгий Флёров, Юрий Оганесян",
+      "description": "Первый трансактиноидный элемент"
+    },
+    "105": {
+      "electron_config": "[Rn] 5f¹⁴ 6d³ 7s²",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "29.3",
+      "discovery_year": "1967",
+      "discoverer": "Георгий Флёров, Юрий Оганесян",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "106": {
+      "electron_config": "[Rn] 5f¹⁴ 6d⁴ 7s²",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "35.0",
+      "discovery_year": "1974",
+      "discoverer": "Георгий Флёров, Юрий Оганесян",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "107": {
+      "electron_config": "[Rn] 5f¹⁴ 6d⁵ 7s²",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "37.1",
+      "discovery_year": "1976",
+      "discoverer": "Георгий Флёров, Юрий Оганесян",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "108": {
+      "electron_config": "[Rn] 5f¹⁴ 6d⁶ 7s²",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "40.7",
+      "discovery_year": "1984",
+      "discoverer": "Георгий Флёров, Юрий Оганесян",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "109": {
+      "electron_config": "[Rn] 5f¹⁴ 6d⁷ 7s²",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "37.4",
+      "discovery_year": "1982",
+      "discoverer": "Георгий Флёров, Юрий Оганесян",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "110": {
+      "electron_config": "[Rn] 5f¹⁴ 6d⁸ 7s²",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "34.8",
+      "discovery_year": "1994",
+      "discoverer": "Георгий Флёров, Юрий Оганесян",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "111": {
+      "electron_config": "[Rn] 5f¹⁴ 6d⁹ 7s²",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "28.7",
+      "discovery_year": "1994",
+      "discoverer": "Георгий Флёров, Юрий Оганесян",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "112": {
+      "electron_config": "[Rn] 5f¹⁴ 6d¹⁰ 7s²",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "23.7",
+      "discovery_year": "1996",
+      "discoverer": "Георгий Флёров, Юрий Оганесян",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "113": {
+      "electron_config": "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "16",
+      "discovery_year": "2003",
+      "discoverer": "Юрий Оганесян",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "114": {
+      "electron_config": "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "14",
+      "discovery_year": "1998",
+      "discoverer": "Юрий Оганесян",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "115": {
+      "electron_config": "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "13.5",
+      "discovery_year": "2003",
+      "discoverer": "Юрий Оганесян",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "116": {
+      "electron_config": "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "12.9",
+      "discovery_year": "2000",
+      "discoverer": "Юрий Оганесян",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "117": {
+      "electron_config": "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "7.2",
+      "discovery_year": "2010",
+      "discoverer": "Юрий Оганесян",
+      "description": "Искусственный радиоактивный элемент"
+    },
+    "118": {
+      "electron_config": "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶",
+      "electronegativity": "Нет данных",
+      "melting_point": "Нет данных",
+      "boiling_point": "Нет данных",
+      "density": "13.65",
+      "discovery_year": "2002",
+      "discoverer": "Юрий Оганесян",
+      "description": "Последний элемент периодической таблицы"
+    }
+  }
+}
