@@ -57,6 +57,8 @@ class ElementDataRepository:
         self.html_template = self._load_html_template()
         self.color_categories = self._load_color_categories()
         self.element_positions = self._load_element_positions()
+        self.quiz_questions = self._load_quiz_questions()
+        print(f"Загружено {len(self.quiz_questions)} вопросов из файла")
     
     def _get_data_path(self, filename):
         """Получаем абсолютный путь к файлу в папке data"""
@@ -114,6 +116,190 @@ class ElementDataRepository:
         except Exception as e:
             print(f"Ошибка загрузки позиций элементов: {e}")
             return {}
+    
+    def _load_quiz_questions(self):
+        """Загружает вопросы для викторины из файла"""
+        try:
+            questions_path = self._get_data_path('quiz_questions.json')
+            if os.path.exists(questions_path):
+                with open(questions_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    questions = data.get('questions', [])
+                    
+                    # Проверяем и обновляем структуру вопросов
+                    valid_questions = []
+                    for q in questions:
+                        if 'difficulty' not in q:
+                            q['difficulty'] = 'Средняя'
+                        if 'category' not in q:
+                            q['category'] = ['Общие']
+                        if 'points' not in q:
+                            difficulty_map = {'Легкая': 5, 'Средняя': 7, 'Сложная': 10}
+                            q['points'] = difficulty_map.get(q['difficulty'], 7)
+                        valid_questions.append(q)
+                    
+                    return valid_questions
+            else:
+                print(f"Файл с вопросами викторины не найден: {questions_path}")
+                return self._create_default_questions()
+        except Exception as e:
+            print(f"Ошибка загрузки вопросов викторины: {e}")
+            return self._create_default_questions()
+    
+    def _create_default_questions(self):
+        """Создает минимальный набор вопросов если файл не найден"""
+        return [
+            {
+                "id": 1,
+                "question": "Какой символ у элемента 'Водород'?",
+                "options": ["H", "O", "He", "N"],
+                "correct_answer": "H",
+                "explanation": "Символ водорода - H (Hydrogenium).",
+                "difficulty": "Легкая",
+                "category": ["Символы"],
+                "points": 5
+            },
+            {
+                "id": 2,
+                "question": "Какой элемент самый распространенный во Вселенной?",
+                "options": ["Кислород", "Водород", "Углерод", "Железо"],
+                "correct_answer": "Водород",
+                "explanation": "Водород составляет около 75% барионной массы Вселенной.",
+                "difficulty": "Средняя",
+                "category": ["Распространенность"],
+                "points": 7
+            },
+            {
+                "id": 3,
+                "question": "Какой элемент имеет самую высокую электроотрицательность?",
+                "options": ["Фтор", "Кислород", "Хлор", "Азот"],
+                "correct_answer": "Фтор",
+                "explanation": "Фтор имеет электроотрицательность 3.98 по шкале Полинга.",
+                "difficulty": "Сложная",
+                "category": ["Свойства"],
+                "points": 10
+            },
+            {
+                "id": 4,
+                "question": "Какой элемент является жидким при комнатной температуре?",
+                "options": ["Ртуть", "Золото", "Алюминий", "Медь"],
+                "correct_answer": "Ртуть",
+                "explanation": "Ртуть - единственный металл, жидкий при комнатной температуре.",
+                "difficulty": "Средняя",
+                "category": ["Физические свойства"],
+                "points": 7
+            },
+            {
+                "id": 5,
+                "question": "Какой газ составляет 78% атмосферы Земли?",
+                "options": ["Кислород", "Азот", "Аргон", "Углекислый газ"],
+                "correct_answer": "Азот",
+                "explanation": "Азот составляет 78% атмосферы Земли.",
+                "difficulty": "Легкая",
+                "category": ["Состав атмосферы"],
+                "points": 5
+            },
+            {
+                "id": 6,
+                "question": "Какой элемент является самым тугоплавким?",
+                "options": ["Вольфрам", "Осмий", "Рений", "Тантал"],
+                "correct_answer": "Вольфрам",
+                "explanation": "Вольфрам имеет температуру плавления 3422°C.",
+                "difficulty": "Сложная",
+                "category": ["Физические свойства"],
+                "points": 10
+            },
+            {
+                "id": 7,
+                "question": "Какой элемент был первым искусственно синтезированным?",
+                "options": ["Технеций", "Нептуний", "Плутоний", "Америций"],
+                "correct_answer": "Технеций",
+                "explanation": "Технеций был синтезирован в 1937 году.",
+                "difficulty": "Сложная",
+                "category": ["История"],
+                "points": 10
+            },
+            {
+                "id": 8,
+                "question": "Какой элемент имеет самую высокую плотность?",
+                "options": ["Осмий", "Иридий", "Платина", "Золото"],
+                "correct_answer": "Осмий",
+                "explanation": "Осмий имеет плотность 22.59 г/см³.",
+                "difficulty": "Сложная",
+                "category": ["Физические свойства"],
+                "points": 10
+            },
+            {
+                "id": 9,
+                "question": "Какой элемент имеет самую низкую температуру плавления?",
+                "options": ["Гелий", "Водород", "Неон", "Кислород"],
+                "correct_answer": "Гелий",
+                "explanation": "Гелий плавится при -272.2°C.",
+                "difficulty": "Сложная",
+                "category": ["Физические свойства"],
+                "points": 10
+            },
+            {
+                "id": 10,
+                "question": "Какой элемент назван в честь России?",
+                "options": ["Рутений", "Германий", "Франций", "Полоний"],
+                "correct_answer": "Рутений",
+                "explanation": "Рутений (Ruthenium) назван в честь России (Ruthenia).",
+                "difficulty": "Сложная",
+                "category": ["История"],
+                "points": 10
+            },
+            {
+                "id": 11,
+                "question": "Какой элемент имеет наименьшую атомную массу?",
+                "options": ["Водород", "Гелий", "Литий", "Бериллий"],
+                "correct_answer": "Водород",
+                "explanation": "Водород имеет атомную массу 1.008 а.е.м.",
+                "difficulty": "Легкая",
+                "category": ["Свойства"],
+                "points": 5
+            },
+            {
+                "id": 12,
+                "question": "Какой металл используется в термометрах?",
+                "options": ["Ртуть", "Серебро", "Золото", "Медь"],
+                "correct_answer": "Ртуть",
+                "explanation": "Ртуть используется в термометрах из-за её температурных свойств.",
+                "difficulty": "Легкая",
+                "category": ["Применение"],
+                "points": 5
+            },
+            {
+                "id": 13,
+                "question": "Какой элемент необходим для фотосинтеза?",
+                "options": ["Кислород", "Углерод", "Водород", "Все вышеперечисленные"],
+                "correct_answer": "Все вышеперечисленные",
+                "explanation": "Все эти элементы необходимы для фотосинтеза.",
+                "difficulty": "Средняя",
+                "category": ["Биохимия"],
+                "points": 7
+            },
+            {
+                "id": 14,
+                "question": "Какой элемент самый распространенный в земной коре?",
+                "options": ["Кислород", "Кремний", "Алюминий", "Железо"],
+                "correct_answer": "Кислород",
+                "explanation": "Кислород составляет около 46% массы земной коры.",
+                "difficulty": "Средняя",
+                "category": ["Геохимия"],
+                "points": 7
+            },
+            {
+                "id": 15,
+                "question": "Какой элемент образует алмаз?",
+                "options": ["Углерод", "Кремний", "Германий", "Бор"],
+                "correct_answer": "Углерод",
+                "explanation": "Алмаз - это аллотропная модификация углерода.",
+                "difficulty": "Легкая",
+                "category": ["Свойства"],
+                "points": 5
+            }
+        ]
     
     def _load_elements_from_json(self):
         try:
@@ -431,156 +617,141 @@ class PeriodicTableView(QWidget):
                     button.setVisible(False)
 
 class QuizQuestion:
-    def __init__(self, question_text, question_format, answer_choices, correct_response, difficulty_level="medium", question_category="elements"):
-        self.question_text = question_text
-        self.question_format = question_format
-        self.answer_choices = answer_choices
-        self.correct_response = correct_response
-        self.difficulty_level = difficulty_level
-        self.question_category = question_category
-        self.point_value = self._compute_point_value()
+    def __init__(self, question_data):
+        self.question_text = question_data.get("question", "Вопрос не определен")
+        self.question_format = "multiple_choice"
+        self.answer_choices = question_data.get("options", [])
+        self.correct_answer = question_data.get("correct_answer", "")
+        self.explanation = question_data.get("explanation", "")
+        self.difficulty_level = question_data.get("difficulty", "Средняя")
+        self.question_category = question_data.get("category", ["general"])
+        self.point_value = question_data.get("points", self._compute_point_value())
+        self.id = question_data.get("id", 0)
     
     def _compute_point_value(self):
-        point_system = {"easy": 1, "medium": 2, "hard": 3}
-        return point_system.get(self.difficulty_level, 1)
+        point_system = {"Легкая": 5, "Средняя": 7, "Сложная": 10}
+        return point_system.get(self.difficulty_level, 7)
     
     def validate_answer(self, user_response):
-        return str(user_response).strip().lower() == str(self.correct_response).strip().lower()
+        return str(user_response).strip() == str(self.correct_answer).strip()
 
 class QuizContentManager:
     def __init__(self, element_repository):
         self.element_repository = element_repository
-        self.question_bank = self._generate_question_bank()
+        self.question_bank = self._load_questions_from_repository()
+        print(f"Создан QuizContentManager с {len(self.question_bank)} вопросами")
     
-    def _generate_question_bank(self):
+    def _load_questions_from_repository(self):
         questions_collection = []
+        question_data_list = self.element_repository.quiz_questions
         
-        for element in self.element_repository.elements_collection:
-            questions_collection.append(QuizQuestion(
-                f"Какой символ у элемента '{element.full_name}'?",
-                "multiple_choice",
-                self._generate_incorrect_options(element.symbol, True),
-                element.symbol,
-                "easy",
-                "elements"
-            ))
+        for question_data in question_data_list:
+            try:
+                question = QuizQuestion(question_data)
+                questions_collection.append(question)
+            except Exception as e:
+                print(f"Ошибка загрузки вопроса {question_data.get('id', 'unknown')}: {e}")
         
-        for element in self.element_repository.elements_collection[:50]:
-            questions_collection.append(QuizQuestion(
-                f"Какой атомный номер у элемента {element.symbol}?",
-                "multiple_choice",
-                self._generate_incorrect_options(element.atomic_num, False),
-                element.atomic_num,
-                "easy",
-                "elements"
-            ))
+        # Добавляем автоматически сгенерированные вопросы если их недостаточно
+        if len(questions_collection) < 15:
+            questions_collection.extend(self._generate_extra_questions())
         
-        for element in self.element_repository.elements_collection[:30]:
-            questions_collection.append(QuizQuestion(
-                f"Как называется элемент с символом {element.symbol}?",
-                "multiple_choice",
-                self._generate_incorrect_names(element.full_name),
-                element.full_name,
-                "easy",
-                "elements"
-            ))
+        print(f"Загружено {len(questions_collection)} вопросов для викторины")
         
-        general_questions = [
-            QuizQuestion(
-                "Какой элемент имеет самую высокую электроотрицательность?",
-                "multiple_choice",
-                ["Кислород", "Фтор", "Хлор", "Азот"],
-                "Фтор",
-                "hard",
-                "properties"
-            ),
-            QuizQuestion(
-                "Самый распространенный элемент в земной коре?",
-                "multiple_choice",
-                ["Кислород", "Кремний", "Алюминий", "Железо"],
-                "Кислород",
-                "easy",
-                "properties"
-            ),
-            QuizQuestion(
-                "Какой элемент является основным компонентом органических соединений?",
-                "multiple_choice",
-                ["Водород", "Кислород", "Углерод", "Азот"],
-                "Углерод",
-                "medium",
-                "properties"
-            ),
-            QuizQuestion(
-                "Какой газ составляет около 78% атмосферы Земли?",
-                "multiple_choice",
-                ["Кислород", "Азот", "Аргон", "Углекислый газ"],
-                "Азот",
-                "easy",
-                "properties"
-            )
-        ]
-        questions_collection.extend(general_questions)
+        # Логируем количество вопросов по сложности
+        difficulties = {}
+        for q in questions_collection:
+            difficulties[q.difficulty_level] = difficulties.get(q.difficulty_level, 0) + 1
+        print(f"Распределение вопросов по сложности: {difficulties}")
         
         return questions_collection
     
-    def _generate_incorrect_options(self, correct_value, is_symbol):
-        if is_symbol:
-            all_options = [elem.symbol for elem in self.element_repository.elements_collection]
-        else:
-            all_options = [elem.atomic_num for elem in self.element_repository.elements_collection]
+    def _generate_extra_questions(self):
+        """Генерирует дополнительные вопросы из элементов"""
+        extra_questions = []
         
-        incorrect_options = [opt for opt in all_options if opt != correct_value]
-        
-        if len(incorrect_options) >= 3:
-            wrong_choices = random.sample(incorrect_options, 3)
-        else:
-            wrong_choices = incorrect_options
-            while len(wrong_choices) < 3:
-                if is_symbol:
-                    fake_option = random.choice(["X", "Y", "Z", "W"])
-                else:
-                    fake_option = random.randint(1, 118)
-                if fake_option not in wrong_choices and fake_option != correct_value:
-                    wrong_choices.append(fake_option)
+        # Вопросы на символы элементов
+        for element in self.element_repository.elements_collection[:20]:  # Берем первые 20 элементов
+            wrong_options = []
+            other_elements = [e for e in self.element_repository.elements_collection if e.symbol != element.symbol]
             
-        all_choices = wrong_choices + [correct_value]
-        random.shuffle(all_choices)
-        return all_choices
-    
-    def _generate_incorrect_names(self, correct_name):
-        all_names = [elem.full_name for elem in self.element_repository.elements_collection]
-        incorrect_names = [name for name in all_names if name != correct_name]
-        
-        if len(incorrect_names) >= 3:
-            wrong_choices = random.sample(incorrect_names, 3)
-        else:
-            wrong_choices = incorrect_names
-            while len(wrong_choices) < 3:
-                fake_names = ["Неон", "Аргон", "Криптон", "Ксенон", "Радон"]
-                fake_name = random.choice(fake_names)
-                if fake_name not in wrong_choices and fake_name != correct_name:
-                    wrong_choices.append(fake_name)
+            if len(other_elements) >= 3:
+                wrong_options = random.sample([e.symbol for e in other_elements], 3)
             
-        all_choices = wrong_choices + [correct_name]
-        random.shuffle(all_choices)
-        return all_choices
+            extra_questions.append(QuizQuestion({
+                "id": 1000 + element.atomic_num,
+                "question": f"Какой символ у элемента '{element.full_name}'?",
+                "options": wrong_options + [element.symbol],
+                "correct_answer": element.symbol,
+                "explanation": f"Символ элемента {element.full_name} - {element.symbol}.",
+                "difficulty": "Легкая",
+                "category": ["Символы"],
+                "points": 5
+            }))
+        
+        return extra_questions
     
     def retrieve_quiz_questions(self, category_filter="all", difficulty_filter="all", question_count=5):
         try:
             filtered_questions = self.question_bank
             
+            # Фильтрация по категории
             if category_filter != "all":
-                filtered_questions = [q for q in filtered_questions if q.question_category == category_filter]
+                if category_filter == "elements":
+                    filtered_questions = [q for q in filtered_questions if "Символы" in q.question_category or "элемент" in q.question_text.lower()]
+                elif category_filter == "properties":
+                    filtered_questions = [q for q in filtered_questions if "Свойства" in q.question_category or any(word in q.question_text.lower() for word in ['плотность', 'температура', 'электроотрицательность', 'тугоплавкий'])]
             
+            # Фильтрация по сложности
             if difficulty_filter != "all":
-                filtered_questions = [q for q in filtered_questions if q.difficulty_level == difficulty_filter]
+                difficulty_map = {"easy": "Легкая", "medium": "Средняя", "hard": "Сложная"}
+                desired_difficulty = difficulty_map.get(difficulty_filter, difficulty_filter)
+                filtered_questions = [q for q in filtered_questions if q.difficulty_level == desired_difficulty]
             
-            if len(filtered_questions) > question_count:
-                return random.sample(filtered_questions, question_count)
+            print(f"После фильтрации найдено {len(filtered_questions)} вопросов")
+            
+            # Если вопросов недостаточно, дополняем вопросами из других категорий/сложностей
+            if len(filtered_questions) < question_count:
+                print(f"Предупреждение: для фильтров (категория: {category_filter}, сложность: {difficulty_filter}) найдено только {len(filtered_questions)} вопросов, нужно {question_count}")
+                
+                # Дополняем вопросами той же сложности (если есть фильтр по сложности)
+                if difficulty_filter != "all":
+                    extra_from_same_difficulty = [q for q in self.question_bank if q.difficulty_level == desired_difficulty and q not in filtered_questions]
+                    filtered_questions.extend(extra_from_same_difficulty)
+                    print(f"Добавлено {len(extra_from_same_difficulty)} вопросов той же сложности")
+                
+                # Если все еще недостаточно, добавляем вопросы любой сложности
+                if len(filtered_questions) < question_count:
+                    all_other_questions = [q for q in self.question_bank if q not in filtered_questions]
+                    random.shuffle(all_other_questions)
+                    filtered_questions.extend(all_other_questions[:question_count - len(filtered_questions)])
+                    print(f"Добавлено {min(len(all_other_questions), question_count - len(filtered_questions))} вопросов любой сложности")
+            
+            # Убедимся, что не возвращаем дубликаты
+            unique_questions = []
+            seen_ids = set()
+            for q in filtered_questions:
+                if q.id not in seen_ids:
+                    unique_questions.append(q)
+                    seen_ids.add(q.id)
+            
+            # Перемешиваем вопросы
+            random.shuffle(unique_questions)
+            
+            if len(unique_questions) > question_count:
+                final_questions = unique_questions[:question_count]
             else:
-                return filtered_questions
+                final_questions = unique_questions
+            
+            print(f"Возвращаем {len(final_questions)} вопросов для викторины")
+            return final_questions
+                
         except Exception as e:
             print(f"Ошибка при получении вопросов: {e}")
+            import traceback
+            traceback.print_exc()
+            # Возвращаем случайные вопросы в случае ошибки
+            random.shuffle(self.question_bank)
             return self.question_bank[:min(question_count, len(self.question_bank))]
 
 class StudyUser:
@@ -935,11 +1106,13 @@ class QuizSession:
                 self.score += current.point_value
                 xp_for_answer = current.point_value * 10
                 self.xp_earned += xp_for_answer
+            else:
+                xp_for_answer = 0
             
             self.answers.append({
                 'question': current.question_text,
                 'user_answer': answer,
-                'correct': current.correct_response,
+                'correct': current.correct_answer,
                 'is_correct': correct,
                 'points': current.point_value if correct else 0,
                 'xp_earned': xp_for_answer if correct else 0
@@ -966,7 +1139,8 @@ class QuizSession:
             speed_bonus = 50
             self.xp_earned += speed_bonus
         
-        accuracy = self.score / sum(q.point_value for q in self.questions)
+        total_possible_points = sum(q.point_value for q in self.questions)
+        accuracy = self.score / total_possible_points if total_possible_points > 0 else 0
         if accuracy >= 0.8:
             accuracy_bonus = int(100 * accuracy)
             self.xp_earned += accuracy_bonus
@@ -979,6 +1153,7 @@ class QuizSession:
             'total_questions': self.total,
             'correct_answers': sum(1 for a in self.answers if a['is_correct']),
             'score': self.score,
+            'max_score': total_possible_points,
             'time_spent_seconds': int(time_elapsed),
             'xp_earned': int(self.xp_earned),
             'level_up': level_up
@@ -1062,7 +1237,7 @@ class QuizInterface(QWidget):
         self.difficulty_combo.addItems(["Любая", "Легкая", "Средняя", "Сложная"])
         settings_layout.addWidget(self.difficulty_combo, 1, 1)
         
-        settings_layout.addWidget(QLabel("Вопросов:"), 2, 0)
+        settings_layout.addWidget(QLabel("Количество вопросов:"), 2, 0)
         self.count_combo = QComboBox()
         self.count_combo.addItems(["5", "10"])
         settings_layout.addWidget(self.count_combo, 2, 1)
@@ -1164,18 +1339,22 @@ class QuizInterface(QWidget):
             return
         
         try:
-            category_map = {"Элементы": "elements", "Свойства": "properties", "Все": "all"}
-            difficulty_map = {"Легкая": "easy", "Средняя": "medium", "Сложная": "hard", "Любая": "all"}
+            category_map = {"Элементы": "elements", "Свойства": "properties", "Все": "all", "Любая": "all"}
+            difficulty_map = {"Легкая": "easy", "Средняя": "medium", "Сложная": "hard", "Любая": "all", "Все": "all"}
             
             category = category_map.get(self.category_combo.currentText(), "all")
             difficulty = difficulty_map.get(self.difficulty_combo.currentText(), "all")
             count = int(self.count_combo.currentText())
+            
+            print(f"Запрос вопросов: категория={category}, сложность={difficulty}, количество={count}")
             
             questions = self.quiz_manager.retrieve_quiz_questions(category, difficulty, count)
             
             if not questions:
                 QMessageBox.warning(self, "Ошибка", "Не найдено вопросов с выбранными критериями!")
                 return
+            
+            print(f"Получено {len(questions)} вопросов для викторины")
             
             self.session = QuizSession("Химическая викторина", questions, self.user_manager)
             self.time_elapsed = 0
@@ -1186,6 +1365,8 @@ class QuizInterface(QWidget):
             
         except Exception as e:
             QMessageBox.critical(self, "Ошибка", f"Ошибка при запуске викторины: {str(e)}")
+            import traceback
+            traceback.print_exc()
     
     def _display_current_question(self):
         if not self.session:
@@ -1216,7 +1397,11 @@ class QuizInterface(QWidget):
     def _display_multiple_choice(self, question):
         self.buttons_group = QButtonGroup(self)
         
-        for option in question.answer_choices:
+        # Перемешиваем варианты ответов
+        options = question.answer_choices.copy()
+        random.shuffle(options)
+        
+        for option in options:
             radio = QRadioButton(str(option))
             radio.setStyleSheet("font-size: 11pt; padding: 8px;")
             self.answers_layout.addWidget(radio)
@@ -1231,6 +1416,7 @@ class QuizInterface(QWidget):
         if selected:
             answer = selected.text()
             correct = self.session.submit_answer(answer)
+            
             if self.session.done:
                 self._finish_quiz()
             else:
@@ -1240,17 +1426,27 @@ class QuizInterface(QWidget):
     
     def _next_question(self):
         if self.session:
-            self.session.submit_answer("")
-            self._display_current_question()
+            # Отмечаем случайный ответ если пользователь не выбрал
+            if not self.buttons_group.checkedButton():
+                buttons = self.buttons_group.buttons()
+                if buttons:
+                    random.choice(buttons).setChecked(True)
+            
+            selected = self.buttons_group.checkedButton()
+            if selected:
+                self._submit_selected_answer()
     
     def _finish_quiz(self):
         self.timer.stop()
         if self.session and not self.session.done:
+            # Завершаем оставшиеся вопросы
+            while not self.session.done:
+                self.session.submit_answer("")
+            
             quiz_data, achievements, level_up = self.session._finalize_quiz_session()
             self.session.quiz_data = quiz_data
             self.session.new_achievements = achievements
             self.session.level_up = level_up
-            self.session.done = True
         
         self._display_results()
         self.screen_stack.setCurrentWidget(self.results_screen)
@@ -1274,8 +1470,16 @@ class QuizInterface(QWidget):
         <p>Получено опыта: +{int(session.xp_earned)} XP</p>
         """
         
-        if hasattr(session, 'level_up') and session.level_up:
+        if hasattr(session, 'level_up') and session.level_up and self.user_manager.active_user:
             summary += f"<p style='color: green; font-weight: bold;'>🎉 Поздравляем! Вы достигли {self.user_manager.active_user.current_level} уровня!</p>"
+        
+        # Показываем новые достижения
+        if hasattr(session, 'new_achievements') and session.new_achievements:
+            achievements_text = "<p style='color: blue;'><b>Новые достижения:</b></p><ul>"
+            for achievement in session.new_achievements:
+                achievements_text += f"<li>{achievement['name']}</li>"
+            achievements_text += "</ul>"
+            summary += achievements_text
         
         self.results_text.setText(summary)
         

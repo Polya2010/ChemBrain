@@ -1,0 +1,69 @@
+{
+  "users": [
+    {
+      "user_identifier": 5970,
+      "username": "ssss",
+      "current_level": 1,
+      "total_experience": 125,
+      "account_creation_date": "2025-12-01T20:55:15",
+      "unlocked_achievements": [
+        {
+          "id": 1,
+          "name": "Первые шаги",
+          "unlock_date": "2025-12-01T20:55:27"
+        },
+        {
+          "id": 7,
+          "name": "Скорострел",
+          "unlock_date": "2025-12-01T20:55:27"
+        }
+      ],
+      "quiz_history_log": [
+        {
+          "timestamp": "2025-12-01T20:55:27",
+          "quiz_name": "Химическая викторина",
+          "total_questions": 5,
+          "correct_answers": 1,
+          "score": 5,
+          "max_score": 27,
+          "time_spent_seconds": 4,
+          "xp_earned": 125,
+          "level_up": false,
+          "achievements_unlocked": [
+            "Первые шаги",
+            "Скорострел"
+          ]
+        }
+      ],
+      "correct_answer_streak": 0,
+      "max_correct_streak": 1
+    }
+  ],
+  "achievements": [
+    {
+      "id": 1,
+      "name": "Первые шаги",
+      "description": "Пройти первую викторину"
+    },
+    {
+      "id": 2,
+      "name": "Серия удач",
+      "description": "Ответить правильно на 10 вопросов подряд"
+    },
+    {
+      "id": 4,
+      "name": "Эрудит",
+      "description": "Набрать 100% правильных ответов в викторине"
+    },
+    {
+      "id": 7,
+      "name": "Скорострел",
+      "description": "Пройти викторину менее чем за 2 минуты"
+    },
+    {
+      "id": 10,
+      "name": "Менделеев нашего времени",
+      "description": "Достичь 10 уровня"
+    }
+  ]
+}
