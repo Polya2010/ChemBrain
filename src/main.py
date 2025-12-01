@@ -54,25 +54,74 @@ class ChemicalElementData:
 class ElementDataRepository:
     def __init__(self):
         self.elements_collection = self._load_elements_from_json()
+        self.html_template = self._load_html_template()
+        self.color_categories = self._load_color_categories()
+        self.element_positions = self._load_element_positions()
     
     def _get_data_path(self, filename):
         """Получаем абсолютный путь к файлу в папке data"""
-        # Получаем директорию, где находится текущий скрипт
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        # Поднимаемся на уровень выше (из src в ChemBrain) и идем в data
         parent_dir = os.path.dirname(current_dir)
         data_dir = os.path.join(parent_dir, 'data')
         return os.path.join(data_dir, filename)
     
+    def _load_html_template(self):
+        """Загружает HTML шаблон из файла"""
+        try:
+            template_path = self._get_data_path('element_template.html')
+            if os.path.exists(template_path):
+                with open(template_path, 'r', encoding='utf-8') as f:
+                    return f.read()
+            else:
+                print(f"Файл HTML шаблона не найден: {template_path}")
+                return "<div>Ошибка: шаблон не загружен</div>"
+        except Exception as e:
+            print(f"Ошибка загрузки HTML шаблона: {e}")
+            return "<div>Ошибка загрузки шаблона</div>"
+    
+    def _load_color_categories(self):
+        """Загружает цветовые категории из файла"""
+        try:
+            color_path = self._get_data_path('color_categories.json')
+            if os.path.exists(color_path):
+                with open(color_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    return data.get('color_categories', {})
+            else:
+                print(f"Файл цветовых категорий не найден: {color_path}")
+                return {}
+        except Exception as e:
+            print(f"Ошибка загрузки цветовых категорий: {e}")
+            return {}
+    
+    def _load_element_positions(self):
+        """Загружает позиции элементов из файла"""
+        try:
+            positions_path = self._get_data_path('element_positions.json')
+            if os.path.exists(positions_path):
+                with open(positions_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    positions = {}
+                    for key_str, value in data.get('positions', {}).items():
+                        try:
+                            positions[int(key_str)] = tuple(value)
+                        except (ValueError, TypeError):
+                            positions[key_str] = tuple(value)
+                    return positions
+            else:
+                print(f"Файл позиций элементов не найден: {positions_path}")
+                return {}
+        except Exception as e:
+            print(f"Ошибка загрузки позиций элементов: {e}")
+            return {}
+    
     def _load_elements_from_json(self):
         try:
-            # Создаем папку data, если она не существует
             data_dir = os.path.dirname(self._get_data_path(''))
             if not os.path.exists(data_dir):
                 os.makedirs(data_dir)
                 print(f"Создана папка: {data_dir}")
             
-            # Загружаем основные данные элементов
             elements_path = self._get_data_path('elements_data.json')
             if not os.path.exists(elements_path):
                 print(f"Файл не найден: {elements_path}")
@@ -81,7 +130,6 @@ class ElementDataRepository:
             with open(elements_path, 'r', encoding='utf-8') as f:
                 elements_data = json.load(f)
             
-            # Загружаем дополнительные свойства
             properties_path = self._get_data_path('element_properties.json')
             if not os.path.exists(properties_path):
                 print(f"Файл не найден: {properties_path}")
@@ -90,7 +138,6 @@ class ElementDataRepository:
             with open(properties_path, 'r', encoding='utf-8') as f:
                 properties_data = json.load(f)
             
-            # Загружаем дополнительные факты и применения
             additional_path = self._get_data_path('element_additional.json')
             if not os.path.exists(additional_path):
                 print(f"Файл не найден: {additional_path}")
@@ -102,7 +149,6 @@ class ElementDataRepository:
             chemical_elements = []
             
             for element_dict in elements_data["elements"]:
-                # Создаем базовый объект элемента
                 element = ChemicalElementData(
                     element_dict["symbol"],
                     element_dict["name"],
@@ -113,12 +159,10 @@ class ElementDataRepository:
                     element_dict["category"]
                 )
                 
-                # Загружаем дополнительные свойства
                 atomic_num_str = str(element.atomic_num)
                 props = properties_data["properties"].get(atomic_num_str, {})
                 additional = additional_data["additional_data"].get(atomic_num_str, {})
                 
-                # Настраиваем физические свойства
                 element.configure_physical_properties(
                     props.get("electron_config", "Неизвестно"),
                     props.get("electronegativity", "Неизвестно"),
@@ -127,14 +171,12 @@ class ElementDataRepository:
                     props.get("density", "Неизвестно")
                 )
                 
-                # Настраиваем информацию об открытии
                 element.set_discovery_info(
                     props.get("discovery_year", "Неизвестно"),
                     props.get("discoverer", "Неизвестно"),
                     props.get("description", "Описание элемента")
                 )
                 
-                # Настраиваем дополнительные данные
                 element.set_additional_data(
                     additional.get("facts", ["Информация отсутствует"]),
                     additional.get("uses", ["Информация отсутствует"])
@@ -216,60 +258,12 @@ class PeriodicTableView(QWidget):
         return scroll_area
     
     def _arrange_elements_in_grid(self):
-        element_positions = self._get_element_grid_positions()
+        element_positions = self.data_repository.element_positions
         
         for element in self.data_repository.elements_collection:
             if element.atomic_num in element_positions:
                 row, column = element_positions[element.atomic_num]
                 self._create_element_button(element, row, column)
-    
-    def _get_element_grid_positions(self):
-        return {
-            # Период 1
-            1: (0, 0),   2: (0, 17),
-            
-            # Период 2
-            3: (1, 0),   4: (1, 1),   5: (1, 12),  6: (1, 13),  7: (1, 14),  
-            8: (1, 15),  9: (1, 16),  10: (1, 17),
-            
-            # Период 3
-            11: (2, 0),  12: (2, 1),  13: (2, 12), 14: (2, 13), 15: (2, 14), 
-            16: (2, 15), 17: (2, 16), 18: (2, 17),
-            
-            # Период 4
-            19: (3, 0),  20: (3, 1),  21: (3, 2),  22: (3, 3),  23: (3, 4),  
-            24: (3, 5),  25: (3, 6),  26: (3, 7),  27: (3, 8),  28: (3, 9),
-            29: (3, 10), 30: (3, 11), 31: (3, 12), 32: (3, 13), 33: (3, 14), 
-            34: (3, 15), 35: (3, 16), 36: (3, 17),
-            
-            # Период 5
-            37: (4, 0),  38: (4, 1),  39: (4, 2),  40: (4, 3),  41: (4, 4),  
-            42: (4, 5),  43: (4, 6),  44: (4, 7),  45: (4, 8),  46: (4, 9),
-            47: (4, 10), 48: (4, 11), 49: (4, 12), 50: (4, 13), 51: (4, 14), 
-            52: (4, 15), 53: (4, 16), 54: (4, 17),
-            
-            # Период 6
-            55: (5, 0),  56: (5, 1),  
-            # Лантаноиды
-            57: (8, 3),  58: (8, 4),  59: (8, 5),  60: (8, 6),  61: (8, 7),  
-            62: (8, 8),  63: (8, 9),  64: (8, 10), 65: (8, 11), 66: (8, 12),
-            67: (8, 13), 68: (8, 14), 69: (8, 15), 70: (8, 16), 71: (8, 17),
-            # Продолжение 6 периода
-            72: (5, 2),  73: (5, 3),  74: (5, 4),  75: (5, 5),  76: (5, 6),  
-            77: (5, 7),  78: (5, 8),  79: (5, 9),  80: (5, 10), 81: (5, 11),
-            82: (5, 12), 83: (5, 13), 84: (5, 14), 85: (5, 15), 86: (5, 17),
-            
-            # Период 7
-            87: (6, 0),  88: (6, 1),
-            # Актиноиды
-            89: (9, 3),  90: (9, 4),  91: (9, 5),  92: (9, 6),  93: (9, 7),  
-            94: (9, 8),  95: (9, 9),  96: (9, 10), 97: (9, 11), 98: (9, 12),
-            99: (9, 13), 100: (9, 14), 101: (9, 15), 102: (9, 16), 103: (9, 17),
-            # Продолжение 7 периода
-            104: (6, 2), 105: (6, 3), 106: (6, 4), 107: (6, 5), 108: (6, 6), 
-            109: (6, 7), 110: (6, 8), 111: (6, 9), 112: (6, 10), 113: (6, 11),
-            114: (6, 12), 115: (6, 13), 116: (6, 14), 117: (6, 15), 118: (6, 17)
-        }
     
     def _create_element_button(self, element, row, column):
         interactive_button = ElementInteractiveButton(element)
@@ -297,18 +291,7 @@ class PeriodicTableView(QWidget):
         self.element_buttons[element.atomic_num] = interactive_button
     
     def _determine_category_color(self, category):
-        color_mapping = {
-            "Щелочные металлы": "#FF6666",
-            "Щелочноземельные металлы": "#FFDEAD",
-            "Переходные металлы": "#FFC0C0",
-            "Постпереходные металлы": "#CCCCCC",
-            "Металлоиды": "#CCFFCC",
-            "Неметаллы": "#A0FFA0",
-            "Галогены": "#FFFF99",
-            "Инертные газы": "#C0FFFF",
-            "Лантаноиды": "#FFBFFF",
-            "Актиноиды": "#FF99CC"
-        }
+        color_mapping = self.data_repository.color_categories
         return color_mapping.get(category, "#FFFFFF")
     
     def _modify_color_brightness(self, color_hex, brightness_change):
@@ -370,55 +353,39 @@ class PeriodicTableView(QWidget):
         self.info_header.setText(f"{element.full_name} ({element.symbol})")
     
     def _generate_detailed_information_html(self, element):
-        # Форматируем числовые значения
         melting_temp = f"{element.melting_point}°C" if element.melting_point and element.melting_point != "Неизвестно" else "Неизвестно"
         boiling_temp = f"{element.boiling_point}°C" if element.boiling_point and element.boiling_point != "Неизвестно" else "Неизвестно"
         density_val = f"{element.density_val} г/см³" if element.density_val and element.density_val != "Неизвестно" else "Неизвестно"
         electronegativity = f"{element.electronegativity_val}" if element.electronegativity_val and element.electronegativity_val != "Неизвестно" else "Неизвестно"
         
-        html_content = f"""
-        <div style="font-family: Arial; line-height: 1.6;">
-            <div style="background: {self._determine_category_color(element.classification)}; 
-                       padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px;">
-                <h1 style="margin: 0; font-size: 36px;">{element.symbol}</h1>
-                <h2 style="margin: 5px 0; color: #333;">{element.full_name}</h2>
-                <h3 style="margin: 0; color: #666;">Атомный номер: {element.atomic_num}</h3>
-            </div>
-            
-            <table style="width: 100%; border-collapse: collapse; font-size: 10pt;">
-                <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold; width: 40%;">Атомная масса:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{element.weight}</td></tr>
-                <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Группа:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{element.group_num}</td></tr>
-                <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Период:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{element.period_num}</td></tr>
-                <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Категория:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{element.classification}</td></tr>
-                <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Электронная конфигурация:</td><td style="padding: 6px; border-bottom: 1px solid #ddd; font-family: monospace;">{element.electron_config}</td></tr>
-                <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Электроотрицательность:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{electronegativity}</td></tr>
-                <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Температура плавления:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{melting_temp}</td></tr>
-                <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Температура кипения:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{boiling_temp}</td></tr>
-                <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Плотность:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{density_val}</td></tr>
-                <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Год открытия:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{element.discovery_year}</td></tr>
-                <tr><td style="padding: 6px; border-bottom: 1px solid #ddd; font-weight: bold;">Первооткрыватель:</td><td style="padding: 6px; border-bottom: 1px solid #ddd;">{element.discoverer_info}</td></tr>
-            </table>
-            
-            <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin: 10px 0;">
-                <h4 style="margin-top: 0; color: #333;">📖 Интересные факты:</h4>
-                <ul style="margin: 0; padding-left: 20px;">
-                    {"".join([f"<li style='margin-bottom: 3px;'>{fact}</li>" for fact in element.interesting_facts_list])}
-                </ul>
-            </div>
-            
-            <div style="background: #e8f4fd; padding: 12px; border-radius: 6px;">
-                <h4 style="margin-top: 0; color: #333;">🏭 Применение:</h4>
-                <ul style="margin: 0; padding-left: 20px;">
-                    {"".join([f"<li style='margin-bottom: 3px;'>{use}</li>" for use in element.common_uses_list])}
-                </ul>
-            </div>
-            
-            <div style="background: #f0f0f0; padding: 12px; border-radius: 6px; margin-top: 10px;">
-                <h4 style="margin-top: 0; color: #333;">📝 Описание:</h4>
-                <p style="margin: 0; line-height: 1.6;">{element.element_description}</p>
-            </div>
-        </div>
-        """
+        facts_list = "".join([f"<li style='margin-bottom: 3px;'>{fact}</li>" for fact in element.interesting_facts_list])
+        uses_list = "".join([f"<li style='margin-bottom: 3px;'>{use}</li>" for use in element.common_uses_list])
+        
+        replacements = {
+            "CATEGORY_COLOR": self._determine_category_color(element.classification),
+            "SYMBOL": element.symbol,
+            "NAME": element.full_name,
+            "ATOMIC_NUMBER": str(element.atomic_num),
+            "ATOMIC_WEIGHT": str(element.weight),
+            "GROUP": str(element.group_num),
+            "PERIOD": str(element.period_num),
+            "CATEGORY": element.classification,
+            "ELECTRON_CONFIG": element.electron_config,
+            "ELECTRONEGATIVITY": electronegativity,
+            "MELTING_POINT": melting_temp,
+            "BOILING_POINT": boiling_temp,
+            "DENSITY": density_val,
+            "DISCOVERY_YEAR": element.discovery_year,
+            "DISCOVERER": element.discoverer_info,
+            "FACTS_LIST": facts_list,
+            "USES_LIST": uses_list,
+            "DESCRIPTION": element.element_description
+        }
+        
+        html_content = self.data_repository.html_template
+        for placeholder, value in replacements.items():
+            html_content = html_content.replace(placeholder, str(value))
+        
         return html_content
     
     def _apply_search_highlighting(self):
@@ -488,7 +455,6 @@ class QuizContentManager:
     def _generate_question_bank(self):
         questions_collection = []
         
-        # Вопросы на символы элементов
         for element in self.element_repository.elements_collection:
             questions_collection.append(QuizQuestion(
                 f"Какой символ у элемента '{element.full_name}'?",
@@ -499,8 +465,7 @@ class QuizContentManager:
                 "elements"
             ))
         
-        # Вопросы на атомные номера
-        for element in self.element_repository.elements_collection[:50]:  # Первые 50 элементов
+        for element in self.element_repository.elements_collection[:50]:
             questions_collection.append(QuizQuestion(
                 f"Какой атомный номер у элемента {element.symbol}?",
                 "multiple_choice",
@@ -510,7 +475,6 @@ class QuizContentManager:
                 "elements"
             ))
         
-        # Вопросы на названия элементов
         for element in self.element_repository.elements_collection[:30]:
             questions_collection.append(QuizQuestion(
                 f"Как называется элемент с символом {element.symbol}?",
@@ -521,7 +485,6 @@ class QuizContentManager:
                 "elements"
             ))
         
-        # Общие вопросы по химии
         general_questions = [
             QuizQuestion(
                 "Какой элемент имеет самую высокую электроотрицательность?",
@@ -693,7 +656,6 @@ class UserAccountManager:
         self.load_user_data()
     
     def _get_data_path(self, filename):
-        """Получаем абсолютный путь к файлу в папке data"""
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)
         data_dir = os.path.join(parent_dir, 'data')
@@ -714,7 +676,6 @@ class UserAccountManager:
             'achievements': self.available_achievements
         }
         try:
-            # Создаем папку data, если она не существует
             data_dir = os.path.dirname(self._get_data_path(''))
             if not os.path.exists(data_dir):
                 os.makedirs(data_dir)
@@ -736,7 +697,6 @@ class UserAccountManager:
         except Exception as error:
             print(f"Ошибка загрузки данных: {error}")
     
-    # Остальные методы остаются без изменений...
     def register_new_user(self, username):
         if any(user.username == username for user in self.registered_users):
             return False, "Пользователь с таким именем уже существует"
@@ -1280,7 +1240,6 @@ class QuizInterface(QWidget):
     
     def _next_question(self):
         if self.session:
-            # Пропускаем текущий вопрос
             self.session.submit_answer("")
             self._display_current_question()
     
@@ -1385,7 +1344,6 @@ class ChemistryLearningApp(QMainWindow):
         self.user_profile_interface = UserProfileScreen(self.user_account_manager)
         application_tabs.addTab(self.user_profile_interface, "Профиль")
         
-        # Добавляем обработчик смены вкладок
         application_tabs.currentChanged.connect(self.on_tab_changed)
         
         primary_layout.addWidget(application_tabs)
@@ -1394,8 +1352,7 @@ class ChemistryLearningApp(QMainWindow):
         self.central_navigation_widget.addWidget(self.main_interface_widget)
     
     def on_tab_changed(self, index):
-        """Обработчик смены вкладок - обновляет профиль при переходе на вкладку профиля"""
-        if index == 2:  # Вкладка "Профиль" имеет индекс 2
+        if index == 2:
             self.user_profile_interface.update_profile_display()
     
     def display_authentication_dialog(self):
@@ -1410,7 +1367,6 @@ class ChemistryLearningApp(QMainWindow):
         if self.user_account_manager.active_user:
             current_user = self.user_account_manager.active_user
             self.user_information_display.setText(f"Пользователь: {current_user.username} | Уровень: {current_user.current_level} | XP: {current_user.total_experience}")
-            # Обновляем профиль при каждом обновлении интерфейса
             self.user_profile_interface.update_profile_display()
         else:
             self.user_information_display.setText("Не авторизован")
