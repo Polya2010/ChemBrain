@@ -12,8 +12,9 @@ from PyQt6.QtWidgets import (
     QDialog, QDialogButtonBox, QFormLayout, QListWidget,
     QListWidgetItem
 )
+from PyQt6.QtPrintSupport import QPrinter, QPrintDialog
 from PyQt6.QtCore import Qt, QTimer, QDateTime
-from PyQt6.QtGui import QFont, QPalette, QColor
+from PyQt6.QtGui import QFont, QPalette, QColor, QKeySequence, QShortcut, QTextDocument
 
 class ChemicalElementData:
     def __init__(self, symbol, full_name, atomic_num, weight, group_num, period_num, classification):
@@ -198,106 +199,6 @@ class ElementDataRepository:
                 "difficulty": "Легкая",
                 "category": ["Состав атмосферы"],
                 "points": 5
-            },
-            {
-                "id": 6,
-                "question": "Какой элемент является самым тугоплавким?",
-                "options": ["Вольфрам", "Осмий", "Рений", "Тантал"],
-                "correct_answer": "Вольфрам",
-                "explanation": "Вольфрам имеет температуру плавления 3422°C.",
-                "difficulty": "Сложная",
-                "category": ["Физические свойства"],
-                "points": 10
-            },
-            {
-                "id": 7,
-                "question": "Какой элемент был первым искусственно синтезированным?",
-                "options": ["Технеций", "Нептуний", "Плутоний", "Америций"],
-                "correct_answer": "Технеций",
-                "explanation": "Технеций был синтезирован в 1937 году.",
-                "difficulty": "Сложная",
-                "category": ["История"],
-                "points": 10
-            },
-            {
-                "id": 8,
-                "question": "Какой элемент имеет самую высокую плотность?",
-                "options": ["Осмий", "Иридий", "Платина", "Золото"],
-                "correct_answer": "Осмий",
-                "explanation": "Осмий имеет плотность 22.59 г/см³.",
-                "difficulty": "Сложная",
-                "category": ["Физические свойства"],
-                "points": 10
-            },
-            {
-                "id": 9,
-                "question": "Какой элемент имеет самую низкую температуру плавления?",
-                "options": ["Гелий", "Водород", "Неон", "Кислород"],
-                "correct_answer": "Гелий",
-                "explanation": "Гелий плавится при -272.2°C.",
-                "difficulty": "Сложная",
-                "category": ["Физические свойства"],
-                "points": 10
-            },
-            {
-                "id": 10,
-                "question": "Какой элемент назван в честь России?",
-                "options": ["Рутений", "Германий", "Франций", "Полоний"],
-                "correct_answer": "Рутений",
-                "explanation": "Рутений (Ruthenium) назван в честь России (Ruthenia).",
-                "difficulty": "Сложная",
-                "category": ["История"],
-                "points": 10
-            },
-            {
-                "id": 11,
-                "question": "Какой элемент имеет наименьшую атомную массу?",
-                "options": ["Водород", "Гелий", "Литий", "Бериллий"],
-                "correct_answer": "Водород",
-                "explanation": "Водород имеет атомную массу 1.008 а.е.м.",
-                "difficulty": "Легкая",
-                "category": ["Свойства"],
-                "points": 5
-            },
-            {
-                "id": 12,
-                "question": "Какой металл используется в термометрах?",
-                "options": ["Ртуть", "Серебро", "Золото", "Медь"],
-                "correct_answer": "Ртуть",
-                "explanation": "Ртуть используется в термометрах из-за её температурных свойств.",
-                "difficulty": "Легкая",
-                "category": ["Применение"],
-                "points": 5
-            },
-            {
-                "id": 13,
-                "question": "Какой элемент необходим для фотосинтеза?",
-                "options": ["Кислород", "Углерод", "Водород", "Все вышеперечисленные"],
-                "correct_answer": "Все вышеперечисленные",
-                "explanation": "Все эти элементы необходимы для фотосинтеза.",
-                "difficulty": "Средняя",
-                "category": ["Биохимия"],
-                "points": 7
-            },
-            {
-                "id": 14,
-                "question": "Какой элемент самый распространенный в земной коре?",
-                "options": ["Кислород", "Кремний", "Алюминий", "Железо"],
-                "correct_answer": "Кислород",
-                "explanation": "Кислород составляет около 46% массы земной коры.",
-                "difficulty": "Средняя",
-                "category": ["Геохимия"],
-                "points": 7
-            },
-            {
-                "id": 15,
-                "question": "Какой элемент образует алмаз?",
-                "options": ["Углерод", "Кремний", "Германий", "Бор"],
-                "correct_answer": "Углерод",
-                "explanation": "Алмаз - это аллотропная модификация углерода.",
-                "difficulty": "Легкая",
-                "category": ["Свойства"],
-                "points": 5
             }
         ]
     
@@ -393,6 +294,7 @@ class PeriodicTableView(QWidget):
         super().__init__()
         self.data_repository = ElementDataRepository()
         self.element_buttons = {}
+        self.current_element = None
         self._build_user_interface()
     
     def _build_user_interface(self):
@@ -409,7 +311,7 @@ class PeriodicTableView(QWidget):
     def _construct_left_panel(self):
         panel_layout = QVBoxLayout()
         
-        header_label = QLabel("ПЕРИОДИЧЕСКАЯ СИСТЕМА ЭЛЕМЕНТОВ")
+        header_label = QLabel("ПЕРИОДИЧЕСКАЯ СИСТЕМА ЭЛЕМЕНТОВ (Ctrl+M)")
         header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         header_label.setStyleSheet("font-size: 16pt; font-weight: bold; margin: 10px;")
         panel_layout.addWidget(header_label)
@@ -534,15 +436,20 @@ class PeriodicTableView(QWidget):
         return scrollable_area
     
     def _display_element_details(self, element):
+        self.current_element = element
         information_html = self._generate_detailed_information_html(element)
         self.detailed_info_display.setHtml(information_html)
+        
         self.info_header.setText(f"{element.full_name} ({element.symbol})")
     
     def _generate_detailed_information_html(self, element):
+        # Форматируем данные
         melting_temp = f"{element.melting_point}°C" if element.melting_point and element.melting_point != "Неизвестно" else "Неизвестно"
         boiling_temp = f"{element.boiling_point}°C" if element.boiling_point and element.boiling_point != "Неизвестно" else "Неизвестно"
         density_val = f"{element.density_val} г/см³" if element.density_val and element.density_val != "Неизвестно" else "Неизвестно"
         electronegativity = f"{element.electronegativity_val}" if element.electronegativity_val and element.electronegativity_val != "Неизвестно" else "Неизвестно"
+        discovery_year = element.discovery_year
+        discoverer = element.discoverer_info
         
         facts_list = "".join([f"<li style='margin-bottom: 3px;'>{fact}</li>" for fact in element.interesting_facts_list])
         uses_list = "".join([f"<li style='margin-bottom: 3px;'>{use}</li>" for use in element.common_uses_list])
@@ -561,14 +468,15 @@ class PeriodicTableView(QWidget):
             "MELTING_POINT": melting_temp,
             "BOILING_POINT": boiling_temp,
             "DENSITY": density_val,
-            "DISCOVERY_YEAR": element.discovery_year,
-            "DISCOVERER": element.discoverer_info,
+            "DISCOVERY_YEAR": discovery_year,
+            "DISCOVERER": discoverer,
             "FACTS_LIST": facts_list,
             "USES_LIST": uses_list,
             "DESCRIPTION": element.element_description
         }
         
         html_content = self.data_repository.html_template
+        
         for placeholder, value in replacements.items():
             html_content = html_content.replace(placeholder, str(value))
         
@@ -615,6 +523,27 @@ class PeriodicTableView(QWidget):
                     button.setVisible(True)
                 else:
                     button.setVisible(False)
+    
+    def show_random_element(self):
+        """Показать случайный элемент"""
+        if self.data_repository.elements_collection:
+            random_element = random.choice(self.data_repository.elements_collection)
+            self._display_element_details(random_element)
+            self._highlight_element_button(random_element.atomic_num)
+    
+    def _highlight_element_button(self, atomic_num):
+        """Выделить кнопку элемента"""
+        button = self.element_buttons.get(atomic_num)
+        if button:
+            original_style = button.styleSheet()
+            
+            # Временное выделение
+            button.setStyleSheet(original_style + """
+                border: 3px solid #FF0000 !important;
+            """)
+            
+            # Возвращаем оригинальный стиль через 1 секунду
+            QTimer.singleShot(1000, lambda: button.setStyleSheet(original_style))
 
 class QuizQuestion:
     def __init__(self, question_data):
@@ -838,7 +767,7 @@ class UserAccountManager:
             {'id': 2, 'name': 'Серия удач', 'description': 'Ответить правильно на 10 вопросов подряд'},
             {'id': 4, 'name': 'Эрудит', 'description': 'Набрать 100% правильных ответов в викторине'},
             {'id': 7, 'name': 'Скорострел', 'description': 'Пройти викторину менее чем за 2 минуты'},
-            {'id': 10, 'name': 'Менделеев нашего времени', 'description': 'Достичь 10 уровня'}
+            {'id': 10, 'name': 'Менделеев нашего времени', 'description': 'Достичь 10 уровня'},
         ]
     
     def save_user_data(self):
@@ -1000,7 +929,7 @@ class UserProfileScreen(QWidget):
     def setup_interface(self):
         layout = QVBoxLayout()
         
-        title = QLabel("ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ")
+        title = QLabel("ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ (Ctrl+S)")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title.setStyleSheet("font-size: 18pt; font-weight: bold; margin: 10px;")
         layout.addWidget(title)
@@ -1188,7 +1117,7 @@ class QuizInterface(QWidget):
     def _setup_interface(self):
         layout = QVBoxLayout()
         
-        title = QLabel("ХИМИЧЕСКАЯ ВИКТОРИНА")
+        title = QLabel("ХИМИЧЕСКАЯ ВИКТОРИНА (Ctrl+W)")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title.setStyleSheet("font-size: 16pt; font-weight: bold; margin: 10px;")
         layout.addWidget(title)
@@ -1247,7 +1176,7 @@ class QuizInterface(QWidget):
         
         buttons = QHBoxLayout()
         
-        self.start_btn = QPushButton("Начать викторину")
+        self.start_btn = QPushButton("Начать викторину (Ctrl+W)")
         self.start_btn.setStyleSheet("font-size: 12pt; padding: 10px;")
         self.start_btn.clicked.connect(self._start_quiz_session)
         buttons.addWidget(self.start_btn)
@@ -1509,7 +1438,7 @@ class QuizInterface(QWidget):
 class ChemistryLearningApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("ChemBrain - Изучение химии")
+        self.setWindowTitle("ChemBrain - Изучение химии (Горячие клавиши: Ctrl+M, Ctrl+W, Ctrl+S, Ctrl+R, Ctrl+P, F11)")
         self.setGeometry(100, 100, 1400, 900)
         
         self.user_account_manager = UserAccountManager()
@@ -1519,7 +1448,13 @@ class ChemistryLearningApp(QMainWindow):
         self.setCentralWidget(self.central_navigation_widget)
         
         self.initialize_main_application_interface()
+        self.setup_hotkeys()
         self.display_authentication_dialog()
+        
+        # Переменная для отслеживания полноэкранного режима
+        self.is_fullscreen = False
+        # Переменная для хранения предыдущих размеров окна
+        self.previous_geometry = None
     
     def initialize_main_application_interface(self):
         self.main_interface_widget = QWidget()
@@ -1555,7 +1490,129 @@ class ChemistryLearningApp(QMainWindow):
         
         self.central_navigation_widget.addWidget(self.main_interface_widget)
     
+    def setup_hotkeys(self):
+        """Настройка горячих клавиш"""
+        # Основные горячие клавиши
+        shortcut_table = QShortcut(QKeySequence("Ctrl+M"), self)
+        shortcut_table.activated.connect(self.switch_to_periodic_table)
+        
+        shortcut_quiz = QShortcut(QKeySequence("Ctrl+W"), self)
+        shortcut_quiz.activated.connect(self.start_quiz)
+        
+        shortcut_stats = QShortcut(QKeySequence("Ctrl+S"), self)
+        shortcut_stats.activated.connect(self.switch_to_profile)
+        
+        # Управление элементами
+        shortcut_random = QShortcut(QKeySequence("Ctrl+R"), self)
+        shortcut_random.activated.connect(self.show_random_element)
+        
+        shortcut_print = QShortcut(QKeySequence("Ctrl+P"), self)
+        shortcut_print.activated.connect(self.print_element_info)
+        
+        # Полноэкранный режим
+        shortcut_fullscreen = QShortcut(QKeySequence("F11"), self)
+        shortcut_fullscreen.activated.connect(self.toggle_fullscreen)
+        
+        # Дополнительные горячие клавиши
+        shortcut_exit = QShortcut(QKeySequence("Ctrl+Q"), self)
+        shortcut_exit.activated.connect(self.close)
+        
+        shortcut_help = QShortcut(QKeySequence("F1"), self)
+        shortcut_help.activated.connect(self.show_help)
+    
+    def switch_to_periodic_table(self):
+        """Переключение на вкладку таблицы Менделеева"""
+        tab_widget = self.findChild(QTabWidget)
+        if tab_widget:
+            tab_widget.setCurrentIndex(0)
+    
+    def start_quiz(self):
+        """Запуск викторины"""
+        tab_widget = self.findChild(QTabWidget)
+        if tab_widget:
+            tab_widget.setCurrentIndex(1)
+            
+            if self.user_account_manager.active_user:
+                QTimer.singleShot(100, self.quiz_interface._start_quiz_session)
+            else:
+                QMessageBox.information(self, "Авторизация", "Для прохождения викторины необходимо войти в систему")
+    
+    def switch_to_profile(self):
+        """Переключение на вкладку профиля"""
+        tab_widget = self.findChild(QTabWidget)
+        if tab_widget:
+            tab_widget.setCurrentIndex(2)
+            QTimer.singleShot(50, self.user_profile_interface.update_profile_display)
+    
+    def show_random_element(self):
+        """Показать случайный элемент (Ctrl+R)"""
+        self.switch_to_periodic_table()
+        QTimer.singleShot(100, lambda: self.periodic_table_interface.show_random_element())
+    
+    def print_element_info(self):
+        """Печать информации об элементе (Ctrl+P)"""
+        if hasattr(self.periodic_table_interface, 'current_element') and self.periodic_table_interface.current_element:
+            element = self.periodic_table_interface.current_element
+            
+            # Создаем принтер и диалог печати
+            printer = QPrinter()
+            print_dialog = QPrintDialog(printer, self)
+            
+            if print_dialog.exec() == QDialog.DialogCode.Accepted:
+                # Получаем HTML контент
+                html_content = self.periodic_table_interface._generate_detailed_information_html(element)
+                
+                # Создаем текстовый документ для печати
+                document = QTextDocument()
+                document.setHtml(html_content)
+                
+                # Печатаем документ
+                document.print_(printer)
+                
+                QMessageBox.information(self, "Печать", "Информация об элементе отправлена на печать.")
+        else:
+            QMessageBox.warning(self, "Печать", "Сначала выберите элемент для печати информации.")
+    
+    def toggle_fullscreen(self):
+        """Полноэкранный режим (F11)"""
+        if not self.is_fullscreen:
+            # Сохраняем текущие размеры окна
+            self.previous_geometry = self.geometry()
+            
+            # Переходим в полноэкранный режим
+            self.showFullScreen()
+            self.is_fullscreen = True
+        else:
+            # Возвращаемся к обычному режиму
+            self.showNormal()
+            if self.previous_geometry:
+                self.setGeometry(self.previous_geometry)
+            self.is_fullscreen = False
+    
+    def show_help(self):
+        """Показать справку по горячим клавишам"""
+        help_text = """
+        Горячие клавиши ChemBrain:
+        
+        Основные:
+        Ctrl+M - Таблица Менделеева
+        Ctrl+W - Викторина
+        Ctrl+S - Профиль
+        
+        Управление элементами:
+        Ctrl+R - Случайный элемент
+        Ctrl+P - Печать информации об элементе
+        
+        Интерфейс:
+        F11 - Полноэкранный режим
+        Ctrl+Q - Выход
+        F1 - Справка
+        """
+        
+        QMessageBox.information(self, "Справка по горячим клавишам", help_text)
+    
     def on_tab_changed(self, index):
+        """Обработчик смены вкладок - обновляет профиль при переходе на вкладку профиля"""
         if index == 2:
             self.user_profile_interface.update_profile_display()
     
