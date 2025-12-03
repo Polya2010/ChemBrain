@@ -1,229 +1,175 @@
 import json
 import os
-from chemical_element_data import ChemicalElementData  # Добавлен импорт
 
-class ElementDataRepository:
+
+class ChemicalElementsStorage:
     def __init__(self):
-        self.elements_collection = self._load_elements_from_json()
-        self.html_template = self._load_html_template()
-        self.color_categories = self._load_color_categories()
-        self.element_positions = self._load_element_positions()
-        self.quiz_questions = self._load_quiz_questions()
-        print(f"Загружено {len(self.quiz_questions)} вопросов из файла")
-    
-    def _get_data_path(self, filename):
-        """Получаем абсолютный путь к файлу в папке data"""
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        parent_dir = os.path.dirname(current_dir)
-        data_dir = os.path.join(parent_dir, 'data')
-        return os.path.join(data_dir, filename)
-    
-    def _load_html_template(self):
-        """Загружает HTML шаблон из файла"""
+        self.elements_list = self._load_chemical_elements()
+        self.template_html = self._read_html_template()
+        self.colors_by_category = self._load_category_colors()
+        self.element_coordinates = self._load_coordinates()
+        self.quiz_questions_data = self._fetch_questions()
+        print(f"Вопросов загружено: {len(self.quiz_questions_data)}")
+
+    def _get_resource_path(self, resource_name):
+        current_file = os.path.dirname(os.path.abspath(__file__))
+        parent_folder = os.path.dirname(current_file)
+        data_folder = os.path.join(parent_folder, 'data')
+        return os.path.join(data_folder, resource_name)
+
+    def _read_html_template(self):
+        template_file = self._get_resource_path('element_template.html')
+        with open(template_file, 'r', encoding='utf-8') as file_content:
+            return file_content.read()
+
+    def _load_category_colors(self):
+        colors_file = self._get_resource_path('color_categories.json')
+        with open(colors_file, 'r', encoding='utf-8') as file_content:
+            json_content = json.load(file_content)
+            return json_content.get('color_categories', {})
+
+    def _load_coordinates(self):
+        coordinates_file = self._get_resource_path('element_positions.json')
+        with open(coordinates_file, 'r', encoding='utf-8') as file_content:
+            json_content = json.load(file_content)
+            coordinates_dict = {}
+            positions = json_content.get('positions', {})
+            for key_str, value_arr in positions.items():
+                try:
+                    coordinates_dict[int(key_str)] = tuple(value_arr)
+                except (ValueError, TypeError):
+                    coordinates_dict[key_str] = tuple(value_arr)
+            return coordinates_dict
+
+    def _load_questions_from_file(self, filename, key_name):
+        questions_file = self._get_resource_path(filename)
+        with open(questions_file, 'r', encoding='utf-8') as file_content:
+            json_content = json.load(file_content)
+            return json_content.get(key_name, [])
+
+    def _fetch_questions(self):
+        all_questions = []
+
         try:
-            template_path = self._get_data_path('element_template.html')
-            if os.path.exists(template_path):
-                with open(template_path, 'r', encoding='utf-8') as f:
-                    return f.read()
-            else:
-                print(f"Файл HTML шаблона не найден: {template_path}")
-                return "<div>Ошибка: шаблон не загружен</div>"
+            main_questions = self._load_questions_from_file(
+                'quiz_questions.json',
+                'questions'
+            )
+            print(f"Основных вопросов загружено: {len(main_questions)}")
+            all_questions.extend(main_questions)
         except Exception as e:
-            print(f"Ошибка загрузки HTML шаблона: {e}")
-            return "<div>Ошибка загрузки шаблона</div>"
-    
-    def _load_color_categories(self):
-        """Загружает цветовые категории из файла"""
+            print(f"Ошибка загрузки основных вопросов: {e}")
+
         try:
-            color_path = self._get_data_path('color_categories.json')
-            if os.path.exists(color_path):
-                with open(color_path, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    return data.get('color_categories', {})
-            else:
-                print(f"Файл цветовых категорий не найден: {color_path}")
-                return {}
+            basic_questions = self._load_questions_from_file(
+                'basic_questions.json',
+                'basic_questions'
+            )
+            print(f"Базовых вопросов загружено: {len(basic_questions)}")
+            all_questions.extend(basic_questions)
         except Exception as e:
-            print(f"Ошибка загрузки цветовых категорий: {e}")
-            return {}
-    
-    def _load_element_positions(self):
-        """Загружает позиции элементов из файла"""
+            print(f"Ошибка загрузки базовых вопросов: {e}")
+
         try:
-            positions_path = self._get_data_path('element_positions.json')
-            if os.path.exists(positions_path):
-                with open(positions_path, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    positions = {}
-                    for key_str, value in data.get('positions', {}).items():
-                        try:
-                            positions[int(key_str)] = tuple(value)
-                        except (ValueError, TypeError):
-                            positions[key_str] = tuple(value)
-                    return positions
-            else:
-                print(f"Файл позиций элементов не найден: {positions_path}")
-                return {}
+            supplementary_questions = self._load_questions_from_file(
+                'supplementary_questions.json',
+                'supplementary_questions'
+            )
+            print(f"Дополнительных вопросов загружено: "
+                  f"{len(supplementary_questions)}")
+            all_questions.extend(supplementary_questions)
         except Exception as e:
-            print(f"Ошибка загрузки позиций элементов: {e}")
-            return {}
-    
-    def _load_quiz_questions(self):
-        """Загружает вопросы для викторины из файла"""
+            print(f"Ошибка загрузки дополнительных вопросов: {e}")
+
         try:
-            questions_path = self._get_data_path('quiz_questions.json')
-            if os.path.exists(questions_path):
-                with open(questions_path, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    questions = data.get('questions', [])
-                    
-                    # Проверяем и обновляем структуру вопросов
-                    valid_questions = []
-                    for q in questions:
-                        if 'difficulty' not in q:
-                            q['difficulty'] = 'Средняя'
-                        if 'category' not in q:
-                            q['category'] = ['Общие']
-                        if 'points' not in q:
-                            difficulty_map = {'Легкая': 5, 'Средняя': 7, 'Сложная': 10}
-                            q['points'] = difficulty_map.get(q['difficulty'], 7)
-                        valid_questions.append(q)
-                    
-                    return valid_questions
-            else:
-                print(f"Файл с вопросами викторины не найден: {questions_path}")
-                return self._create_default_questions()
+            element_questions = self._load_questions_from_file(
+                'element_quiz_questions.json',
+                'element_questions'
+            )
+            print(f"Вопросов по элементам загружено: {len(element_questions)}")
+            all_questions.extend(element_questions)
         except Exception as e:
-            print(f"Ошибка загрузки вопросов викторины: {e}")
-            return self._create_default_questions()
-    
-    def _create_default_questions(self):
-        """Создает минимальный набор вопросов если файл не найден"""
-        return [
-            {
-                "id": 1,
-                "question": "Какой символ у элемента 'Водород'?",
-                "options": ["H", "O", "He", "N"],
-                "correct_answer": "H",
-                "explanation": "Символ водорода - H (Hydrogenium).",
-                "difficulty": "Легкая",
-                "category": ["Символы"],
-                "points": 5
-            },
-            {
-                "id": 2,
-                "question": "Какой элемент самый распространенный во Вселенной?",
-                "options": ["Кислород", "Водород", "Углерод", "Железо"],
-                "correct_answer": "Водород",
-                "explanation": "Водород составляет около 75% барионной массы Вселенной.",
-                "difficulty": "Средняя",
-                "category": ["Распространенность"],
-                "points": 7
-            },
-            {
-                "id": 3,
-                "question": "Какой элемент имеет самую высокую электроотрицательность?",
-                "options": ["Фтор", "Кислород", "Хлор", "Азот"],
-                "correct_answer": "Фтор",
-                "explanation": "Фтор имеет электроотрицательность 3.98 по шкале Полинга.",
-                "difficulty": "Сложная",
-                "category": ["Свойства"],
-                "points": 10
-            },
-            {
-                "id": 4,
-                "question": "Какой элемент является жидким при комнатной температуре?",
-                "options": ["Ртуть", "Золото", "Алюминий", "Медь"],
-                "correct_answer": "Ртуть",
-                "explanation": "Ртуть - единственный металл, жидкий при комнатной температуре.",
-                "difficulty": "Средняя",
-                "category": ["Физические свойства"],
-                "points": 7
-            },
-            {
-                "id": 5,
-                "question": "Какой газ составляет 78% атмосферы Земли?",
-                "options": ["Кислород", "Азот", "Аргон", "Углекислый газ"],
-                "correct_answer": "Азот",
-                "explanation": "Азот составляет 78% атмосферы Земли.",
-                "difficulty": "Легкая",
-                "category": ["Состав атмосферы"],
-                "points": 5
-            }
-        ]
-    
-    def _load_elements_from_json(self):
-        try:
-            data_dir = os.path.dirname(self._get_data_path(''))
-            if not os.path.exists(data_dir):
-                os.makedirs(data_dir)
-                print(f"Создана папка: {data_dir}")
-            
-            elements_path = self._get_data_path('elements_data.json')
-            if not os.path.exists(elements_path):
-                print(f"Файл не найден: {elements_path}")
-                return []
-                
-            with open(elements_path, 'r', encoding='utf-8') as f:
-                elements_data = json.load(f)
-            
-            properties_path = self._get_data_path('element_properties.json')
-            if not os.path.exists(properties_path):
-                print(f"Файл не найден: {properties_path}")
-                return []
-                
-            with open(properties_path, 'r', encoding='utf-8') as f:
-                properties_data = json.load(f)
-            
-            additional_path = self._get_data_path('element_additional.json')
-            if not os.path.exists(additional_path):
-                print(f"Файл не найден: {additional_path}")
-                return []
-                
-            with open(additional_path, 'r', encoding='utf-8') as f:
-                additional_data = json.load(f)
-            
-            chemical_elements = []
-            
-            for element_dict in elements_data["elements"]:
-                element = ChemicalElementData(
-                    element_dict["symbol"],
-                    element_dict["name"],
-                    element_dict["atomic_number"],
-                    element_dict["atomic_weight"],
-                    element_dict["group"],
-                    element_dict["period"],
-                    element_dict["category"]
+            print(f"Ошибка загрузки вопросов по элементам: {e}")
+
+        processed_questions = []
+        for question_item in all_questions:
+            if 'difficulty' not in question_item:
+                question_item['difficulty'] = 'Средняя'
+            if 'category' not in question_item:
+                question_item['category'] = ['Общие']
+            if 'points' not in question_item:
+                difficulty_weights = {
+                    'Легкая': 5,
+                    'Средняя': 7,
+                    'Сложная': 10
+                }
+                question_item['points'] = difficulty_weights.get(
+                    question_item['difficulty'],
+                    7
                 )
-                
-                atomic_num_str = str(element.atomic_num)
-                props = properties_data["properties"].get(atomic_num_str, {})
-                additional = additional_data["additional_data"].get(atomic_num_str, {})
-                
-                element.configure_physical_properties(
-                    props.get("electron_config", "Неизвестно"),
-                    props.get("electronegativity", "Неизвестно"),
-                    props.get("melting_point", "Неизвестно"),
-                    props.get("boiling_point", "Неизвестно"),
-                    props.get("density", "Неизвестно")
-                )
-                
-                element.set_discovery_info(
-                    props.get("discovery_year", "Неизвестно"),
-                    props.get("discoverer", "Неизвестно"),
-                    props.get("description", "Описание элемента")
-                )
-                
-                element.set_additional_data(
-                    additional.get("facts", ["Информация отсутствует"]),
-                    additional.get("uses", ["Информация отсутствует"])
-                )
-                
-                chemical_elements.append(element)
-            
-            print(f"Успешно загружено {len(chemical_elements)} элементов из JSON файлов")
-            return chemical_elements
-            
-        except Exception as e:
-            print(f"Ошибка загрузки данных из JSON: {e}")
-            return []
+            processed_questions.append(question_item)
+
+        print(f"Всего вопросов загружено: {len(processed_questions)}")
+        return processed_questions
+
+    def _load_chemical_elements(self):
+        from chemical_element_data import ElementInfo
+
+        elements_file = self._get_resource_path('elements_data.json')
+        with open(elements_file, 'r', encoding='utf-8') as file_content:
+            elements_json = json.load(file_content)
+
+        properties_file = self._get_resource_path('element_properties.json')
+        with open(properties_file, 'r', encoding='utf-8') as file_content:
+            properties_json = json.load(file_content)
+
+        additional_file = self._get_resource_path('element_additional.json')
+        with open(additional_file, 'r', encoding='utf-8') as file_content:
+            additional_json = json.load(file_content)
+
+        chemical_elements_collection = []
+
+        for element_item in elements_json["elements"]:
+            element_instance = ElementInfo(
+                element_item["symbol"],
+                element_item["name"],
+                element_item["atomic_number"],
+                element_item["atomic_weight"],
+                element_item["group"],
+                element_item["period"],
+                element_item["category"]
+            )
+
+            atomic_number_str = str(element_instance.atomic_number)
+            properties_data = properties_json["properties"].get(
+                atomic_number_str,
+                {}
+            )
+            additional_data = additional_json["additional_data"].get(
+                atomic_number_str,
+                {}
+            )
+
+            element_instance.setup_properties(
+                properties_data.get("electron_config", "Не указано"),
+                properties_data.get("electronegativity", "Не указано"),
+                properties_data.get("melting_point", "Не указано"),
+                properties_data.get("boiling_point", "Не указано"),
+                properties_data.get("density", "Не указано")
+            )
+
+            element_instance.setup_history(
+                properties_data.get("discovery_year", "Не указано"),
+                properties_data.get("discoverer", "Не указано"),
+                properties_data.get("description", "Описание элемента")
+            )
+
+            element_instance.setup_additional(
+                additional_data.get("facts", ["Информация отсутствует"]),
+                additional_data.get("uses", ["Информация отсутствует"])
+            )
+
+            chemical_elements_collection.append(element_instance)
+
+        print(f"Элементов загружено: {len(chemical_elements_collection)}")
+        return chemical_elements_collection

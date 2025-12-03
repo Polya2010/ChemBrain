@@ -5,373 +5,492 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, QTimer
 import random
-from quiz_session import QuizSession
+from quiz_session import QuizAttempt
 
-class QuizInterface(QWidget):
-    def __init__(self, quiz_manager, user_manager):
+
+class QuizInteractionPanel(QWidget):
+    def __init__(self, questions_manager, account_manager):
         super().__init__()
-        self.quiz_manager = quiz_manager
-        self.user_manager = user_manager
-        self.session = None
-        self.timer = QTimer()
-        self.timer.timeout.connect(self._update_timer_display)
-        self.time_elapsed = 0
-        self._setup_interface()
-    
-    def _setup_interface(self):
-        layout = QVBoxLayout()
-        
-        title = QLabel("ХИМИЧЕСКАЯ ВИКТОРИНА (Ctrl+W)")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size: 16pt; font-weight: bold; margin: 10px;")
-        layout.addWidget(title)
-        
-        self.screen_stack = QStackedWidget()
-        
-        self.selection_screen = self._create_selection_screen()
-        self.screen_stack.addWidget(self.selection_screen)
-        
-        self.quiz_screen = self._create_quiz_screen()
-        self.screen_stack.addWidget(self.quiz_screen)
-        
-        self.results_screen = self._create_results_screen()
-        self.screen_stack.addWidget(self.results_screen)
-        
-        layout.addWidget(self.screen_stack)
-        self.setLayout(layout)
-        
-        self._show_selection_screen()
-    
-    def _create_selection_screen(self):
-        widget = QWidget()
-        layout = QVBoxLayout()
-        
-        if self.user_manager.active_user:
-            user_info = QGroupBox("Текущий пользователь")
-            user_layout = QHBoxLayout()
-            
-            user_layout.addWidget(QLabel(f"Пользователь: {self.user_manager.active_user.username}"))
-            user_layout.addWidget(QLabel(f"Уровень: {self.user_manager.active_user.current_level}"))
-            user_layout.addWidget(QLabel(f"XP: {self.user_manager.active_user.total_experience}"))
-            
-            user_info.setLayout(user_layout)
-            layout.addWidget(user_info)
-        
-        settings = QGroupBox("Настройки викторины")
-        settings_layout = QGridLayout()
-        
-        settings_layout.addWidget(QLabel("Категория:"), 0, 0)
-        self.category_combo = QComboBox()
-        self.category_combo.addItems(["Все", "Элементы", "Свойства"])
-        settings_layout.addWidget(self.category_combo, 0, 1)
-        
-        settings_layout.addWidget(QLabel("Сложность:"), 1, 0)
-        self.difficulty_combo = QComboBox()
-        self.difficulty_combo.addItems(["Любая", "Легкая", "Средняя", "Сложная"])
-        settings_layout.addWidget(self.difficulty_combo, 1, 1)
-        
-        settings_layout.addWidget(QLabel("Количество вопросов:"), 2, 0)
-        self.count_combo = QComboBox()
-        self.count_combo.addItems(["5", "10"])
-        settings_layout.addWidget(self.count_combo, 2, 1)
-        
-        settings.setLayout(settings_layout)
-        layout.addWidget(settings)
-        
-        buttons = QHBoxLayout()
-        
-        self.start_btn = QPushButton("Начать викторину (Ctrl+W)")
-        self.start_btn.setStyleSheet("font-size: 12pt; padding: 10px;")
-        self.start_btn.clicked.connect(self._start_quiz_session)
-        buttons.addWidget(self.start_btn)
-        
-        layout.addLayout(buttons)
-        widget.setLayout(layout)
-        return widget
-    
-    def _create_quiz_screen(self):
-        widget = QWidget()
-        layout = QVBoxLayout()
-        
-        info = QHBoxLayout()
-        
-        self.progress_bar = QProgressBar()
-        self.progress_bar.setMaximum(100)
-        info.addWidget(QLabel("Прогресс:"))
-        info.addWidget(self.progress_bar)
-        
-        self.score_label = QLabel("Счет: 0")
-        info.addWidget(self.score_label)
-        
-        self.time_label = QLabel("Время: 00:00")
-        info.addWidget(self.time_label)
-        
-        layout.addLayout(info)
-        
-        self.question_label = QLabel()
-        self.question_label.setWordWrap(True)
-        self.question_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.question_label.setStyleSheet("font-size: 12pt; margin: 15px;")
-        layout.addWidget(self.question_label)
-        
-        self.answers_widget = QWidget()
+        self.questions_manager = questions_manager
+        self.account_manager = account_manager
+        self.active_attempt = None
+        self.quiz_timer = QTimer()
+        self.quiz_timer.timeout.connect(self._update_time_display)
+        self.elapsed_seconds = 0
+        self._initialize_interface()
+
+    def _initialize_interface(self):
+        main_layout = QVBoxLayout()
+
+        header_label = QLabel("ВИКТОРИНА ПО ХИМИИ")
+        header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header_label.setStyleSheet(
+            "font-size: 16pt; font-weight: bold; margin: 10px;"
+        )
+        main_layout.addWidget(header_label)
+
+        self.screen_container = QStackedWidget()
+
+        self.selection_panel = self._create_selection_panel()
+        self.screen_container.addWidget(self.selection_panel)
+
+        self.quiz_panel = self._create_quiz_panel()
+        self.screen_container.addWidget(self.quiz_panel)
+
+        self.results_panel = self._create_results_panel()
+        self.screen_container.addWidget(self.results_panel)
+
+        main_layout.addWidget(self.screen_container)
+        self.setLayout(main_layout)
+
+        self._display_selection_panel()
+
+    def _create_selection_panel(self):
+        panel_widget = QWidget()
+        panel_layout = QVBoxLayout()
+
+        if self.account_manager.current_user:
+            user_info_container = QGroupBox("Текущий пользователь")
+            user_info_layout = QHBoxLayout()
+
+            username = self.account_manager.current_user.user_name
+            userlevel = self.account_manager.current_user.user_level
+            userxp = self.account_manager.current_user.accumulated_experience
+
+            user_info_layout.addWidget(QLabel(f"Пользователь: {username}"))
+            user_info_layout.addWidget(QLabel(f"Уровень: {userlevel}"))
+            user_info_layout.addWidget(QLabel(f"XP: {userxp}"))
+
+            user_info_container.setLayout(user_info_layout)
+            panel_layout.addWidget(user_info_container)
+
+        settings_container = QGroupBox("Параметры викторины")
+        settings_grid = QGridLayout()
+
+        settings_grid.addWidget(QLabel("Тематика:"), 0, 0)
+        self.category_selector = QComboBox()
+        cat_items = ["Все", "Элементы", "Характеристики"]
+        self.category_selector.addItems(cat_items)
+        settings_grid.addWidget(self.category_selector, 0, 1)
+
+        settings_grid.addWidget(QLabel("Сложность:"), 1, 0)
+        self.difficulty_selector = QComboBox()
+        diff_items = ["Любая", "Легкая", "Средняя", "Сложная"]
+        self.difficulty_selector.addItems(diff_items)
+        settings_grid.addWidget(self.difficulty_selector, 1, 1)
+
+        settings_grid.addWidget(QLabel("Количество вопросов:"), 2, 0)
+        self.quantity_selector = QComboBox()
+        self.quantity_selector.addItems(["5", "10"])
+        settings_grid.addWidget(self.quantity_selector, 2, 1)
+
+        settings_container.setLayout(settings_grid)
+        panel_layout.addWidget(settings_container)
+
+        control_buttons = QHBoxLayout()
+
+        self.start_quiz_button = QPushButton("Начать викторину")
+        self.start_quiz_button.setStyleSheet("font-size: 12pt; padding: 10px;")
+        self.start_quiz_button.clicked.connect(self._initiate_quiz)
+        control_buttons.addWidget(self.start_quiz_button)
+
+        panel_layout.addLayout(control_buttons)
+        panel_widget.setLayout(panel_layout)
+        return panel_widget
+
+    def _create_quiz_panel(self):
+        panel_widget = QWidget()
+        panel_layout = QVBoxLayout()
+
+        status_info = QHBoxLayout()
+
+        self.progress_indicator = QProgressBar()
+        self.progress_indicator.setMaximum(100)
+        status_info.addWidget(QLabel("Прогресс:"))
+        status_info.addWidget(self.progress_indicator)
+
+        self.score_display = QLabel("Очки: 0")
+        status_info.addWidget(self.score_display)
+
+        self.time_display = QLabel("Время: 00:00")
+        status_info.addWidget(self.time_display)
+
+        panel_layout.addLayout(status_info)
+
+        self.question_display = QLabel()
+        self.question_display.setWordWrap(True)
+        self.question_display.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.question_display.setStyleSheet("font-size: 12pt; margin: 15px;")
+        panel_layout.addWidget(self.question_display)
+
+        self.answers_container = QWidget()
         self.answers_layout = QVBoxLayout()
-        self.answers_widget.setLayout(self.answers_layout)
-        layout.addWidget(self.answers_widget)
-        
-        nav = QHBoxLayout()
-        
-        self.next_btn = QPushButton("Следующий вопрос")
-        self.next_btn.clicked.connect(self._next_question)
-        nav.addWidget(self.next_btn)
-        
-        self.finish_btn = QPushButton("Завершить викторину")
-        self.finish_btn.clicked.connect(self._finish_quiz)
-        nav.addWidget(self.finish_btn)
-        
-        layout.addLayout(nav)
-        
-        widget.setLayout(layout)
-        return widget
-    
-    def _create_results_screen(self):
-        widget = QWidget()
-        layout = QVBoxLayout()
-        
-        self.results_title = QLabel("Результаты викторины")
-        self.results_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.results_title.setStyleSheet("font-size: 16pt; font-weight: bold; margin: 10px;")
-        layout.addWidget(self.results_title)
-        
-        self.results_text = QLabel()
-        self.results_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.results_text.setStyleSheet("font-size: 12pt; margin: 10px;")
-        layout.addWidget(self.results_text)
-        
-        self.details = QTextEdit()
-        self.details.setReadOnly(True)
-        layout.addWidget(self.details)
-        
-        buttons = QHBoxLayout()
-        
-        self.new_btn = QPushButton("Новая викторина")
-        self.new_btn.clicked.connect(self._show_selection_screen)
-        buttons.addWidget(self.new_btn)
-        
-        layout.addLayout(buttons)
-        
-        widget.setLayout(layout)
-        return widget
-    
-    def _show_selection_screen(self):
-        self.screen_stack.setCurrentWidget(self.selection_screen)
-    
-    def _start_quiz_session(self):
+        self.answers_container.setLayout(self.answers_layout)
+        panel_layout.addWidget(self.answers_container)
+
+        navigation_controls = QHBoxLayout()
+
+        self.next_question_button = QPushButton("Следующий вопрос")
+        self.next_question_button.clicked.connect(self._proceed_to_next)
+        navigation_controls.addWidget(self.next_question_button)
+
+        self.finish_quiz_button = QPushButton("Завершить викторина")
+        self.finish_quiz_button.clicked.connect(self._complete_quiz)
+        navigation_controls.addWidget(self.finish_quiz_button)
+
+        panel_layout.addLayout(navigation_controls)
+
+        panel_widget.setLayout(panel_layout)
+        return panel_widget
+
+    def _create_results_panel(self):
+        panel_widget = QWidget()
+        panel_layout = QVBoxLayout()
+
+        self.results_header = QLabel("Результаты викторины")
+        self.results_header.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.results_header.setStyleSheet(
+            "font-size: 16pt; font-weight: bold; margin: 10px;"
+        )
+        panel_layout.addWidget(self.results_header)
+
+        self.results_summary = QLabel()
+        self.results_summary.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.results_summary.setStyleSheet("font-size: 12pt; margin: 10px;")
+        panel_layout.addWidget(self.results_summary)
+
+        self.detailed_results = QTextEdit()
+        self.detailed_results.setReadOnly(True)
+        panel_layout.addWidget(self.detailed_results)
+
+        action_buttons = QHBoxLayout()
+
+        self.new_quiz_button = QPushButton("Новая викторина")
+        self.new_quiz_button.clicked.connect(self._display_selection_panel)
+        action_buttons.addWidget(self.new_quiz_button)
+
+        panel_layout.addLayout(action_buttons)
+
+        panel_widget.setLayout(panel_layout)
+        return panel_widget
+
+    def _display_selection_panel(self):
+        self.screen_container.setCurrentWidget(self.selection_panel)
+
+    def _initiate_quiz(self):
         try:
-            if not self.user_manager.active_user:
-                QMessageBox.warning(self, "Ошибка", "Пожалуйста, войдите в систему для прохождения викторины")
+            if not self.account_manager.current_user:
+                QMessageBox.warning(
+                    self,
+                    "Ошибка",
+                    "Для участия в викторине требуется авторизация"
+                )
                 return
-            
-            category_map = {"Элементы": "elements", "Свойства": "properties", "Все": "all", "Любая": "all"}
-            difficulty_map = {"Легкая": "easy", "Средняя": "medium", "Сложная": "hard", "Любая": "all", "Все": "all"}
-            
-            category = category_map.get(self.category_combo.currentText(), "all")
-            difficulty = difficulty_map.get(self.difficulty_combo.currentText(), "all")
-            count = int(self.count_combo.currentText())
-            
-            print(f"Запрос вопросов: категория={category}, сложность={difficulty}, количество={count}")
-            
-            questions = self.quiz_manager.retrieve_quiz_questions(category, difficulty, count)
-            
-            if not questions:
-                QMessageBox.warning(self, "Ошибка", "Не найдено вопросов с выбранными критериями!")
+
+            category_mapping = {
+                "Элементы": "elements",
+                "Характеристики": "properties",
+                "Все": "all",
+                "Любая": "all"
+            }
+            difficulty_mapping = {
+                "Легкая": "easy",
+                "Средняя": "medium",
+                "Сложная": "hard",
+                "Любая": "all",
+                "Все": "all"
+            }
+
+            selected_category = category_mapping.get(
+                self.category_selector.currentText(),
+                "all"
+            )
+            selected_difficulty = difficulty_mapping.get(
+                self.difficulty_selector.currentText(),
+                "all"
+            )
+            questions_amount = int(self.quantity_selector.currentText())
+
+            print(f"Параметры викторины: категория={selected_category}, "
+                  f"сложность={selected_difficulty}, "
+                  f"количество={questions_amount}")
+
+            question_list = self.questions_manager.get_filtered_questions(
+                selected_category,
+                selected_difficulty,
+                questions_amount
+            )
+
+            if not question_list:
+                QMessageBox.warning(
+                    self,
+                    "Ошибка",
+                    "Вопросы по выбранным критериям не найдены!"
+                )
                 return
-            
-            print(f"Получено {len(questions)} вопросов для викторины")
-            
-            self.session = QuizSession("Химическая викторина", questions, self.user_manager)
-            self.time_elapsed = 0
-            self.timer.start(1000)
-            
-            self._display_current_question()
-            self.screen_stack.setCurrentWidget(self.quiz_screen)
-            
-        except Exception as e:
-            print(f"Ошибка при запуске викторины: {e}")
+
+            print(f"Подготовлено {len(question_list)} вопросов")
+
+            self.active_attempt = QuizAttempt(
+                "Химическая викторина",
+                question_list,
+                self.account_manager
+            )
+            self.elapsed_seconds = 0
+            self.quiz_timer.start(1000)
+
+            self._show_current_question()
+            self.screen_container.setCurrentWidget(self.quiz_panel)
+
+        except Exception as error:
+            print(f"Ошибка запуска викторины: {error}")
             import traceback
             traceback.print_exc()
-            QMessageBox.critical(self, "Ошибка", f"Ошибка при запуске викторины: {str(e)}")
-    
-    def _display_current_question(self):
+            QMessageBox.critical(
+                self,
+                "Ошибка",
+                f"Ошибка при запуске викторины: {str(error)}"
+            )
+
+    def _show_current_question(self):
         try:
-            if not self.session:
+            if not self.active_attempt:
                 return
-            
-            question = self.session.get_current_question()
-            if not question:
-                self._finish_quiz()
+
+            current_question = self.active_attempt.get_active_question()
+            if not current_question:
+                self._complete_quiz()
                 return
-            
-            progress_value = self.session.get_progress_percentage()
-            self.progress_bar.setValue(int(progress_value))
-            self.score_label.setText(f"Счет: {self.session.score}")
-            
-            self.question_label.setText(f"Вопрос {self.session.current_index + 1}: {question.question_text}")
-            
+
+            progress_value = self.active_attempt.calculate_progress()
+            self.progress_indicator.setValue(int(progress_value))
+            score_text = f"Очки: {self.active_attempt.total_score}"
+            self.score_display.setText(score_text)
+
+            q_index = self.active_attempt.current_question_index + 1
+            q_text = current_question.question_text
+            question_text = f"Вопрос {q_index}: {q_text}"
+            self.question_display.setText(question_text)
+
             self._clear_answer_options()
-            
-            if question.question_format == "multiple_choice":
-                self._display_multiple_choice(question)
-        except Exception as e:
-            print(f"Ошибка при отображении вопроса: {e}")
-    
+
+            if current_question.question_type == "multiple_choice":
+                self._present_multiple_choice(current_question)
+        except Exception as error:
+            print(f"Ошибка отображения вопроса: {error}")
+
     def _clear_answer_options(self):
         for i in reversed(range(self.answers_layout.count())):
-            widget = self.answers_layout.itemAt(i).widget()
-            if widget:
-                widget.deleteLater()
-    
-    def _display_multiple_choice(self, question):
-        self.buttons_group = QButtonGroup(self)
-        
-        # Перемешиваем варианты ответов
-        options = question.answer_choices.copy()
-        random.shuffle(options)
-        
-        for option in options:
-            radio = QRadioButton(str(option))
-            radio.setStyleSheet("font-size: 11pt; padding: 8px;")
-            self.answers_layout.addWidget(radio)
-            self.buttons_group.addButton(radio)
-        
-        submit_btn = QPushButton("Ответить")
-        submit_btn.clicked.connect(self._submit_selected_answer)
-        self.answers_layout.addWidget(submit_btn)
-    
-    def _submit_selected_answer(self):
+            widget_item = self.answers_layout.itemAt(i).widget()
+            if widget_item:
+                widget_item.deleteLater()
+
+    def _present_multiple_choice(self, question_item):
+        self.answer_options_group = QButtonGroup(self)
+
+        answer_options = question_item.possible_answers.copy()
+        random.shuffle(answer_options)
+
+        for option_text in answer_options:
+            option_button = QRadioButton(str(option_text))
+            option_button.setStyleSheet("font-size: 11pt; padding: 8px;")
+            self.answers_layout.addWidget(option_button)
+            self.answer_options_group.addButton(option_button)
+
+        submit_button = QPushButton("Ответить")
+        submit_button.clicked.connect(self._process_selected_answer)
+        self.answers_layout.addWidget(submit_button)
+
+    def _process_selected_answer(self):
         try:
-            selected = self.buttons_group.checkedButton()
-            if selected:
-                answer = selected.text()
-                correct = self.session.submit_answer(answer)
-                
-                if self.session.done:
-                    self._finish_quiz()
+            selected_option = self.answer_options_group.checkedButton()
+            if selected_option:
+                user_answer = selected_option.text()
+                self.active_attempt.process_user_response(user_answer)
+
+                if self.active_attempt.completed:
+                    self._complete_quiz()
                 else:
-                    self._display_current_question()
+                    self._show_current_question()
             else:
-                QMessageBox.warning(self, "Внимание", "Пожалуйста, выберите ответ!")
-        except Exception as e:
-            print(f"Ошибка при отправке ответа: {e}")
+                QMessageBox.warning(
+                    self,
+                    "Внимание",
+                    "Необходимо выбрать вариант ответа!"
+                )
+        except Exception as error:
+            print(f"Ошибка обработки ответа: {error}")
             import traceback
             traceback.print_exc()
-    
-    def _next_question(self):
+
+    def _proceed_to_next(self):
         try:
-            if self.session:
-                # Отмечаем случайный ответ если пользователь не выбрал
-                if not self.buttons_group.checkedButton():
-                    buttons = self.buttons_group.buttons()
-                    if buttons:
-                        random.choice(buttons).setChecked(True)
-                
-                selected = self.buttons_group.checkedButton()
-                if selected:
-                    self._submit_selected_answer()
-        except Exception as e:
-            print(f"Ошибка при переходе к следующему вопросу: {e}")
-    
-    def _finish_quiz(self):
+            if self.active_attempt:
+                if not self.answer_options_group.checkedButton():
+                    available_buttons = self.answer_options_group.buttons()
+                    if available_buttons:
+                        random.choice(available_buttons).setChecked(True)
+
+                selected_option = self.answer_options_group.checkedButton()
+                if selected_option:
+                    self._process_selected_answer()
+        except Exception as error:
+            print(f"Ошибка перехода: {error}")
+
+    def _complete_quiz(self):
         try:
             print("Завершение викторины...")
-            self.timer.stop()
-            
-            if self.session and not self.session.done:
-                print("Завершаем оставшиеся вопросы...")
-                # Завершаем оставшиеся вопросы
-                while not self.session.done:
-                    self.session.submit_answer("")
-                
-                print("Завершаем сессию...")
-                quiz_data, achievements, level_up = self.session._finalize_quiz_session()
-                if quiz_data:
-                    self.session.quiz_data = quiz_data
-                    self.session.new_achievements = achievements
-                    self.session.level_up = level_up
+            self.quiz_timer.stop()
+
+            if self.active_attempt and not self.active_attempt.completed:
+                print("Завершение оставшихся вопросов...")
+                while not self.active_attempt.completed:
+                    self.active_attempt.process_user_response("")
+
+                print("Финализация попытки...")
+                quiz_results, unlocked_achievements, level_increased = (
+                    self.active_attempt._finalize_quiz_attempt()
+                )
+                if quiz_results:
+                    self.active_attempt.quiz_results = quiz_results
+                    self.active_attempt.new_achievements = (
+                        unlocked_achievements
+                    )
+                    self.active_attempt.level_increased = level_increased
                 else:
-                    print("Ошибка: quiz_data is None")
-            
-            print("Отображаем результаты...")
-            self._display_results()
-            self.screen_stack.setCurrentWidget(self.results_screen)
+                    print("Ошибка: результаты викторины отсутствуют")
+
+            print("Отображение результатов...")
+            self._present_final_results()
+            self.screen_container.setCurrentWidget(self.results_panel)
             print("Результаты отображены")
-            
-        except Exception as e:
-            print(f"КРИТИЧЕСКАЯ ОШИБКА при завершении викторины: {e}")
+
+        except Exception as error:
+            print(f"КРИТИЧЕСКАЯ ОШИБКА завершения: {error}")
             import traceback
             traceback.print_exc()
-            QMessageBox.critical(self, "Ошибка", f"Произошла ошибка при завершении викторины: {str(e)}")
-    
-    def _display_results(self):
+            QMessageBox.critical(
+                self,
+                "Ошибка",
+                f"Ошибка завершения викторины: {str(error)}"
+            )
+
+    def _present_final_results(self):
         try:
-            if not self.session:
-                print("Ошибка: сессия не существует")
+            if not self.active_attempt:
+                print("Ошибка: активная попытка отсутствует")
                 return
-            
-            session = self.session
-            total_points = sum(q.point_value for q in session.questions) if session.questions else 0
-            percentage = (session.score / total_points) * 100 if total_points > 0 else 0
-            
-            correct_answers = sum(1 for a in session.answers if a['is_correct']) if session.answers else 0
-            
-            summary = f"""
+
+            current_attempt = self.active_attempt
+            max_score = 0
+            if current_attempt.question_set:
+                max_score = sum(
+                    q.score_value for q in current_attempt.question_set
+                )
+
+            success_percentage = 0
+            if max_score > 0:
+                success_percentage = (
+                    current_attempt.total_score / max_score
+                ) * 100
+
+            correct_count = 0
+            if current_attempt.answer_records:
+                correct_count = sum(
+                    1 for r in current_attempt.answer_records
+                    if r['answer_correct']
+                )
+
+            correct_answers_text = (
+                f"<p>Правильных ответов: {correct_count} из "
+                f"{current_attempt.question_count}</p>"
+            )
+            time_spent = int(current_attempt.get_time_elapsed())
+            time_text = f"<p>Затраченное время: {time_spent} секунд</p>"
+            xp_gained = int(current_attempt.experience_gained)
+            xp_text = f"<p>Полученный опыт: +{xp_gained} XP</p>"
+
+            summary_text = f"""
             <h3>Викторина завершена!</h3>
-            <p>Правильных ответов: {correct_answers} из {session.total}</p>
-            <p>Набрано очков: {session.score} из {total_points}</p>
-            <p>Результат: {percentage:.1f}%</p>
-            <p>Затраченное время: {int(session.get_elapsed_time())} секунд</p>
-            <p>Получено опыта: +{int(session.xp_earned)} XP</p>
+            {correct_answers_text}
+            <p>Набрано очков: {current_attempt.total_score} из {max_score}</p>
+            <p>Результативность: {success_percentage:.1f}%</p>
+            {time_text}
+            {xp_text}
             """
-            
-            if hasattr(session, 'level_up') and session.level_up and self.user_manager.active_user:
-                summary += f"<p style='color: green; font-weight: bold;'>🎉 Поздравляем! Вы достигли {self.user_manager.active_user.current_level} уровня!</p>"
-            
-            # Показываем новые достижения
-            if hasattr(session, 'new_achievements') and session.new_achievements:
-                achievements_text = "<p style='color: blue;'><b>Новые достижения:</b></p><ul>"
-                for achievement in session.new_achievements:
-                    achievements_text += f"<li>{achievement['name']}</li>"
+
+            user_has_leveled_up = (
+                hasattr(current_attempt, 'level_increased')
+                and current_attempt.level_increased
+                and self.account_manager.current_user
+            )
+
+            if user_has_leveled_up:
+                level_msg = (
+                    f"🎉 Достигнут уровень "
+                    f"{self.account_manager.current_user.user_level}!"
+                )
+                summary_text += (
+                    f"<p style='color: green; font-weight: bold;'>"
+                    f"{level_msg}</p>"
+                )
+
+            has_new_achievements = (
+                hasattr(current_attempt, 'new_achievements')
+                and current_attempt.new_achievements
+            )
+
+            if has_new_achievements:
+                achievements_text = (
+                    "<p style='color: blue;'><b>Новые достижения:</b></p><ul>"
+                )
+                for achievement_item in current_attempt.new_achievements:
+                    achievements_text += f"<li>{achievement_item['name']}</li>"
                 achievements_text += "</ul>"
-                summary += achievements_text
-            
-            self.results_text.setText(summary)
-            
-            details = "<h4>Детальные результаты:</h4><ul>"
-            if session.answers:
-                for i, answer in enumerate(session.answers, 1):
-                    status = "✓ Правильно" if answer['is_correct'] else "✗ Неправильно"
-                    xp_text = f" (+{int(answer['xp_earned'])} XP)" if answer['is_correct'] else ""
-                    details += f"""
+                summary_text += achievements_text
+
+            self.results_summary.setText(summary_text)
+
+            detailed_report = "<h4>Детализированные результаты:</h4><ul>"
+            if current_attempt.answer_records:
+                for idx, answer_record in enumerate(
+                    current_attempt.answer_records,
+                    1
+                ):
+                    is_correct = answer_record['answer_correct']
+                    status = "✓ Верно" if is_correct else "✗ Неверно"
+                    xp_info = ""
+                    if is_correct:
+                        xp_awarded = int(answer_record['experience_awarded'])
+                        xp_info = f" (+{xp_awarded} XP)"
+                    question_content = answer_record['question_content']
+                    user_response = answer_record['user_response']
+                    correct_response = answer_record['correct_response']
+                    color_style = "green" if is_correct else "red"
+                    color_text = f"<span style='color: {color_style}'>"
+                    detailed_report += f"""
                     <li style="margin-bottom: 10px;">
-                        <b>Вопрос {i}:</b> {answer['question']}<br>
-                        <span style="color: {'green' if answer['is_correct'] else 'red'}">
-                            {status}{xp_text}
+                        <b>Вопрос {idx}:</b> {question_content}<br>
+                        {color_text}
+                            {status}{xp_info}
                         </span><br>
-                        Ваш ответ: {answer['user_answer']}<br>
-                        Правильный ответ: {answer['correct']}
+                        Ваш ответ: {user_response}<br>
+                        Правильный ответ: {correct_response}
                     </li>
                     """
-            details += "</ul>"
-            self.details.setHtml(details)
-            
-        except Exception as e:
-            print(f"Ошибка при отображении результатов: {e}")
+            detailed_report += "</ul>"
+            self.detailed_results.setHtml(detailed_report)
+
+        except Exception as error:
+            print(f"Ошибка отображения результатов: {error}")
             import traceback
             traceback.print_exc()
-            self.results_text.setText(f"Ошибка при отображении результатов: {str(e)}")
-    
-    def _update_timer_display(self):
-        self.time_elapsed += 1
-        minutes = self.time_elapsed // 60
-        seconds = self.time_elapsed % 60
-        self.time_label.setText(f"Время: {minutes:02d}:{seconds:02d}")
+            error_msg = f"Ошибка отображения результатов: {str(error)}"
+            self.results_summary.setText(error_msg)
+
+    def _update_time_display(self):
+        self.elapsed_seconds += 1
+        minutes = self.elapsed_seconds // 60
+        seconds = self.elapsed_seconds % 60
+        time_text = f"Время: {minutes:02d}:{seconds:02d}"
+        self.time_display.setText(time_text)

@@ -1,35 +1,60 @@
-class ChemicalElementData:
-    def __init__(self, symbol, full_name, atomic_num, weight, group_num, period_num, classification):
+class ElementInfo:
+    def __init__(
+        self,
+        symbol,
+        name,
+        atomic_number,
+        atomic_mass,
+        group,
+        period,
+        type_class
+    ):
         self.symbol = symbol
-        self.full_name = full_name
-        self.atomic_num = atomic_num
-        self.weight = weight
-        self.group_num = group_num
-        self.period_num = period_num
-        self.classification = classification
-        self.electron_config = ""
-        self.electronegativity_val = None
-        self.melting_point = None
-        self.boiling_point = None
-        self.density_val = None
-        self.discovery_year = ""
-        self.discoverer_info = ""
-        self.element_description = ""
-        self.interesting_facts_list = []
-        self.common_uses_list = []
-    
-    def configure_physical_properties(self, config, electro, melt, boil, density):
-        self.electron_config = config
-        self.electronegativity_val = electro
-        self.melting_point = melt
-        self.boiling_point = boil
-        self.density_val = density
-    
-    def set_discovery_info(self, year, discoverer, description):
-        self.discovery_year = year
-        self.discoverer_info = discoverer
-        self.element_description = description
-    
-    def set_additional_data(self, facts, uses):
-        self.interesting_facts_list = facts
-        self.common_uses_list = uses
+        self.name = name
+        self.atomic_number = atomic_number
+        self.atomic_mass = atomic_mass
+        self.group = group
+        self.period = period
+        self.type_class = type_class
+        self.electron_configuration = ""
+        self.electronegativity_value = None
+        self.melting_temperature = None
+        self.boiling_temperature = None
+        self.density_value = None
+        self.year_of_discovery = ""
+        self.discoverer = ""
+        self.detailed_description = ""
+        self.interesting_facts = []
+        self.common_applications = []
+
+    def setup_properties(
+        self,
+        electron_config,
+        electronegativity,
+        melting_temp,
+        boiling_temp,
+        density
+    ):
+        self.electron_configuration = electron_config
+        self.electronegativity_value = electronegativity
+        self.melting_temperature = melting_temp
+        self.boiling_temperature = boiling_temp
+        self.density_value = density
+
+    def setup_history(
+        self,
+        discovery_year,
+        discoverer_name,
+        description_text
+    ):
+        self.year_of_discovery = discovery_year
+        self.discoverer = discoverer_name
+        self.detailed_description = description_text
+
+    def setup_additional(
+        self,
+        fact_list,
+        application_list
+    ):
+        self.interesting_facts = fact_list
+        self.common_applications = application_list

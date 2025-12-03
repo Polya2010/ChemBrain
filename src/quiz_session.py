@@ -1,128 +1,181 @@
 from PyQt6.QtCore import QDateTime, Qt
 
-class QuizSession:
-    def __init__(self, name, questions, user_manager):
-        self.name = name
-        self.questions = questions
-        self.user_manager = user_manager
-        self.current_index = 0
-        self.score = 0
-        self.total = len(questions) if questions else 0
-        self.start_time = QDateTime.currentDateTime()
-        self.answers = []
-        self.done = False
-        self.xp_earned = 0
-    
-    def get_current_question(self):
-        if self.current_index < self.total and self.questions:
-            return self.questions[self.current_index]
+
+class QuizAttempt:
+    def __init__(self, quiz_name, question_set, account_handler):
+        self.quiz_name = quiz_name
+        self.question_set = question_set
+        self.account_handler = account_handler
+        self.current_question_index = 0
+        self.total_score = 0
+        self.question_count = len(question_set) if question_set else 0
+        self.attempt_start_time = QDateTime.currentDateTime()
+        self.answer_records = []
+        self.completed = False
+        self.experience_gained = 0
+
+    def get_active_question(self):
+        if self.current_question_index < self.question_count:
+            if self.question_set:
+                return self.question_set[self.current_question_index]
         return None
-    
-    def submit_answer(self, answer):
+
+    def process_user_response(self, user_answer):
         try:
-            current = self.get_current_question()
-            if not current:
-                self.done = True
+            active_question = self.get_active_question()
+            if not active_question:
+                self.completed = True
                 return False
-            
-            correct = current.validate_answer(answer)
-            
-            if self.user_manager.active_user:
-                self.user_manager.active_user.update_answer_streak(correct)
-            
-            if correct:
-                self.score += current.point_value
-                xp_for_answer = current.point_value * 10
-                self.xp_earned += xp_for_answer
+
+            is_correct = active_question.check_answer(user_answer)
+
+            if self.account_handler.current_user:
+                self.account_handler.current_user.update_streak_counter(
+                    is_correct
+                )
+
+            if is_correct:
+                self.total_score += active_question.score_value
+                experience_for_answer = active_question.score_value * 10
+                self.experience_gained += experience_for_answer
             else:
-                xp_for_answer = 0
-            
-            self.answers.append({
-                'question': current.question_text,
-                'user_answer': answer,
-                'correct': current.correct_answer,
-                'is_correct': correct,
-                'points': current.point_value if correct else 0,
-                'xp_earned': xp_for_answer if correct else 0
+                experience_for_answer = 0
+
+            self.answer_records.append({
+                'question_content': active_question.question_text,
+                'user_response': user_answer,
+                'correct_response': active_question.correct_response,
+                'answer_correct': is_correct,
+                'points_awarded': (
+                    active_question.score_value if is_correct else 0
+                ),
+                'experience_awarded': (
+                    experience_for_answer if is_correct else 0
+                )
             })
-            
-            self.current_index += 1
-            
-            if self.current_index >= self.total:
-                self.done = True
-                return self._finalize_quiz_session()
-            
-            return correct
-        except Exception as e:
-            print(f"Ошибка при отправке ответа: {e}")
+
+            self.current_question_index += 1
+
+            if self.current_question_index >= self.question_count:
+                self.completed = True
+                return self._finalize_quiz_attempt()
+
+            return is_correct
+        except Exception as error:
+            print(f"Ошибка обработки ответа: {error}")
             import traceback
             traceback.print_exc()
             return False
-    
-    def _finalize_quiz_session(self):
+
+    def _finalize_quiz_attempt(self):
         try:
-            if not self.user_manager or not self.user_manager.active_user:
+            if not self.account_handler:
+                print("Обработчик аккаунта отсутствует")
+                return None, [], False
+            if not self.account_handler.current_user:
                 print("Пользователь не авторизован")
                 return None, [], False
-            
-            print("Начинаем финализацию викторины...")
-            
-            completion_xp = len(self.questions) * 5 if self.questions else 0
-            self.xp_earned += completion_xp
-            
-            time_elapsed = self.start_time.secsTo(QDateTime.currentDateTime())
-            print(f"Время викторины: {time_elapsed} секунд")
-            
-            if time_elapsed < 300:
-                speed_bonus = 50
-                self.xp_earned += speed_bonus
-                print(f"Бонус за скорость: +{speed_bonus} XP")
-            
-            total_possible_points = sum(q.point_value for q in self.questions) if self.questions else 0
-            accuracy = self.score / total_possible_points if total_possible_points > 0 else 0
-            if accuracy >= 0.8:
-                accuracy_bonus = int(100 * accuracy)
-                self.xp_earned += accuracy_bonus
+
+            print("Начало финализации викторины...")
+
+            completion_bonus = (
+                len(self.question_set) * 5 if self.question_set else 0
+            )
+            self.experience_gained += completion_bonus
+
+            elapsed_time_seconds = self.attempt_start_time.secsTo(
+                QDateTime.currentDateTime()
+            )
+            print(f"Время выполнения: {elapsed_time_seconds} секунд")
+
+            if elapsed_time_seconds < 300:
+                speed_reward = 50
+                self.experience_gained += speed_reward
+                print(f"Бонус за скорость: +{speed_reward} XP")
+
+            maximum_possible_score = 0
+            if self.question_set:
+                maximum_possible_score = sum(
+                    q.score_value for q in self.question_set
+                )
+
+            accuracy_ratio = 0
+            if maximum_possible_score > 0:
+                accuracy_ratio = self.total_score / maximum_possible_score
+
+            if accuracy_ratio >= 0.8:
+                accuracy_bonus = int(100 * accuracy_ratio)
+                self.experience_gained += accuracy_bonus
                 print(f"Бонус за точность: +{accuracy_bonus} XP")
-            
-            print(f"Всего получено XP: {self.xp_earned}")
-            
-            level_up = self.user_manager.active_user.add_experience_points(int(self.xp_earned))
-            
-            quiz_data = {
-                'timestamp': QDateTime.currentDateTime().toString(Qt.DateFormat.ISODate),
-                'quiz_name': self.name,
-                'total_questions': self.total,
-                'correct_answers': sum(1 for a in self.answers if a['is_correct']) if self.answers else 0,
-                'score': self.score,
-                'max_score': total_possible_points,
-                'time_spent_seconds': int(time_elapsed),
-                'xp_earned': int(self.xp_earned),
-                'level_up': level_up
+
+            print(f"Общий полученный опыт: {self.experience_gained}")
+
+            level_increased = (
+                self.account_handler.current_user.add_experience(
+                    int(self.experience_gained)
+                )
+            )
+
+            correct_responses_count = 0
+            if self.answer_records:
+                correct_responses_count = sum(
+                    1 for response in self.answer_records
+                    if response['answer_correct']
+                )
+
+            quiz_summary = {
+                'timestamp': QDateTime.currentDateTime().toString(
+                    Qt.DateFormat.ISODate
+                ),
+                'quiz_title': self.quiz_name,
+                'total_questions': self.question_count,
+                'correct_responses': correct_responses_count,
+                'final_score': self.total_score,
+                'maximum_score': maximum_possible_score,
+                'time_elapsed_seconds': int(elapsed_time_seconds),
+                'experience_earned': int(self.experience_gained),
+                'level_increased': level_increased
             }
-            
-            print(f"Данные викторины: {quiz_data}")
-            
-            self.user_manager.active_user.record_quiz_result(quiz_data)
-            
-            achievements_unlocked = self.user_manager.evaluate_achievement_progress(quiz_data)
-            quiz_data['achievements_unlocked'] = [a['name'] for a in achievements_unlocked]
-            
-            print(f"Разблокировано достижений: {len(achievements_unlocked)}")
-            
-            self.user_manager.save_user_data()
-            
+
+            print(f"Данные викторины: {quiz_summary}")
+
+            self.account_handler.current_user.save_quiz_result(
+                quiz_summary
+            )
+
+            unlocked_achievements = (
+                self.account_handler.check_achievement_progress(
+                    quiz_summary
+                )
+            )
+
+            achievement_names = [
+                achievement['name']
+                for achievement in unlocked_achievements
+            ]
+            quiz_summary['unlocked_achievements'] = achievement_names
+
+            print(f"Получено достижений: {len(unlocked_achievements)}")
+
+            self.account_handler.save_user_data()
+
             print("Викторина успешно завершена")
-            return quiz_data, achievements_unlocked, level_up
-            
-        except Exception as e:
-            print(f"Ошибка при финализации викторины: {e}")
+            return quiz_summary, unlocked_achievements, level_increased
+
+        except Exception as error:
+            print(f"Ошибка при финализации викторины: {error}")
             import traceback
             traceback.print_exc()
             return None, [], False
-    
-    def get_progress_percentage(self):
-        return (self.current_index / self.total) * 100 if self.total > 0 else 0
-    
-    def get_elapsed_time(self):
-        return self.start_time.secsTo(QDateTime.currentDateTime())
+
+    def calculate_progress(self):
+        if self.question_count > 0:
+            return (
+                self.current_question_index / self.question_count
+            ) * 100
+        return 0
+
+    def get_time_elapsed(self):
+        return self.attempt_start_time.secsTo(
+            QDateTime.currentDateTime()
+        )

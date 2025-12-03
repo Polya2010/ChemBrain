@@ -1,18 +1,30 @@
-class QuizQuestion:
-    def __init__(self, question_data):
-        self.question_text = question_data.get("question", "Вопрос не определен")
-        self.question_format = "multiple_choice"
-        self.answer_choices = question_data.get("options", [])
-        self.correct_answer = question_data.get("correct_answer", "")
-        self.explanation = question_data.get("explanation", "")
-        self.difficulty_level = question_data.get("difficulty", "Средняя")
-        self.question_category = question_data.get("category", ["general"])
-        self.point_value = question_data.get("points", self._compute_point_value())
-        self.id = question_data.get("id", 0)
-    
-    def _compute_point_value(self):
-        point_system = {"Легкая": 5, "Средняя": 7, "Сложная": 10}
-        return point_system.get(self.difficulty_level, 7)
-    
-    def validate_answer(self, user_response):
-        return str(user_response).strip() == str(self.correct_answer).strip()
+class QuestionItem:
+    def __init__(self, question_info):
+        self.question_text = question_info.get(
+            "question",
+            "Текст вопроса отсутствует"
+        )
+        self.question_type = "multiple_choice"
+        self.possible_answers = question_info.get("options", [])
+        self.correct_response = question_info.get("correct_answer", "")
+        self.explanation_text = question_info.get("explanation", "")
+        self.complexity_level = question_info.get("difficulty", "Средняя")
+        self.categories = question_info.get("category", ["general"])
+        self.score_value = question_info.get(
+            "points",
+            self._calculate_score()
+        )
+        self.identifier = question_info.get("id", 0)
+
+    def _calculate_score(self):
+        score_mapping = {
+            "Легкая": 5,
+            "Средняя": 7,
+            "Сложная": 10
+        }
+        return score_mapping.get(self.complexity_level, 7)
+
+    def check_answer(self, user_response):
+        user_answer = str(user_response).strip()
+        correct_answer = str(self.correct_response).strip()
+        return user_answer == correct_answer

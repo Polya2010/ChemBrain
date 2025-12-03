@@ -1,13 +1,15 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-from chemistry_learning_app import ChemistryLearningApp
+from chemistry_learning_app import ChemistryEducationApp
 
-def launch_application():
-    app = QApplication(sys.argv)
-    app.setStyle('Fusion')
-    main_window = ChemistryLearningApp()
-    main_window.show()
-    sys.exit(app.exec())
+
+def start_application():
+    application_instance = QApplication(sys.argv)
+    application_instance.setStyle('Fusion')
+    main_window_instance = ChemistryEducationApp()
+    main_window_instance.show()
+    sys.exit(application_instance.exec())
+
 
 if __name__ == '__main__':
-    launch_application()
+    start_application()

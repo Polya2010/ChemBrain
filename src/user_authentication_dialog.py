@@ -1,65 +1,84 @@
 from PyQt6.QtWidgets import (
-    QDialog, QVBoxLayout, QFormLayout, QLineEdit, 
-    QPushButton, QHBoxLayout, QLabel
+    QDialog,
+    QVBoxLayout,
+    QFormLayout,
+    QLineEdit,
+    QPushButton,
+    QHBoxLayout,
+    QLabel,
 )
 
-class UserAuthenticationDialog(QDialog):
-    def __init__(self, user_manager):
+
+class LoginDialog(QDialog):
+    def __init__(self, account_manager):
         super().__init__()
-        self.user_account_manager = user_manager
-        self.setWindowTitle("ChemBrain - Вход в систему")
+        self.account_manager = account_manager
+        self.setWindowTitle("ChemBrain - Авторизация")
         self.setModal(True)
-        self.initialize_dialog_interface()
-    
-    def initialize_dialog_interface(self):
+        self._create_interface()
+
+    def _create_interface(self):
         dialog_layout = QVBoxLayout()
-        
-        input_form_layout = QFormLayout()
-        
-        self.username_input_field = QLineEdit()
-        self.username_input_field.setPlaceholderText("Введите имя пользователя")
-        input_form_layout.addRow("Имя пользователя:", self.username_input_field)
-        
-        dialog_layout.addLayout(input_form_layout)
-        
-        action_buttons_layout = QHBoxLayout()
-        
-        self.login_action_button = QPushButton("Войти")
-        self.login_action_button.clicked.connect(self.authenticate_user)
-        action_buttons_layout.addWidget(self.login_action_button)
-        
-        self.registration_action_button = QPushButton("Зарегистрироваться")
-        self.registration_action_button.clicked.connect(self.register_new_user)
-        action_buttons_layout.addWidget(self.registration_action_button)
-        
-        dialog_layout.addLayout(action_buttons_layout)
-        
-        self.status_display_label = QLabel("")
-        self.status_display_label.setStyleSheet("color: red;")
-        dialog_layout.addWidget(self.status_display_label)
-        
+
+        form_section = QFormLayout()
+
+        self.username_field = QLineEdit()
+        self.username_field.setPlaceholderText(
+            "Введите имя пользователя"
+        )
+        form_section.addRow("Имя пользователя:", self.username_field)
+
+        dialog_layout.addLayout(form_section)
+
+        button_section = QHBoxLayout()
+
+        self.login_button = QPushButton("Войти")
+        self.login_button.clicked.connect(self._perform_login)
+        button_section.addWidget(self.login_button)
+
+        self.register_button = QPushButton("Регистрация")
+        self.register_button.clicked.connect(self._perform_registration)
+        button_section.addWidget(self.register_button)
+
+        self.exit_button = QPushButton("Выйти")
+        self.exit_button.setStyleSheet(
+            "background-color: #ff6666; color: white;"
+        )
+        self.exit_button.clicked.connect(self.reject)
+        button_section.addWidget(self.exit_button)
+
+        dialog_layout.addLayout(button_section)
+
+        self.status_message = QLabel("")
+        self.status_message.setStyleSheet("color: red;")
+        dialog_layout.addWidget(self.status_message)
+
         self.setLayout(dialog_layout)
-    
-    def authenticate_user(self):
-        username_input = self.username_input_field.text().strip()
-        if not username_input:
-            self.status_display_label.setText("Введите имя пользователя")
+
+    def _perform_login(self):
+        input_username = self.username_field.text().strip()
+        if not input_username:
+            self.status_message.setText("Введите имя пользователя")
             return
-        
-        authentication_result, message = self.user_account_manager.authenticate_user(username_input)
-        if authentication_result:
+
+        login_success, message_text = (
+            self.account_manager.verify_user(input_username)
+        )
+        if login_success:
             self.accept()
         else:
-            self.status_display_label.setText(message)
-    
-    def register_new_user(self):
-        username_input = self.username_input_field.text().strip()
-        if not username_input:
-            self.status_display_label.setText("Введите имя пользователя")
+            self.status_message.setText(message_text)
+
+    def _perform_registration(self):
+        input_username = self.username_field.text().strip()
+        if not input_username:
+            self.status_message.setText("Введите имя пользователя")
             return
-        
-        registration_result, message = self.user_account_manager.register_new_user(username_input)
-        if registration_result:
+
+        registration_success, message_text = (
+            self.account_manager.create_new_account(input_username)
+        )
+        if registration_success:
             self.accept()
         else:
-            self.status_display_label.setText(message)
+            self.status_message.setText(message_text)
