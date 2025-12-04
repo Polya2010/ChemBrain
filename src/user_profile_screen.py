@@ -1,238 +1,236 @@
-import os
 from PyQt6.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QGroupBox,
-    QGridLayout,
-    QLabel,
-    QProgressBar,
-    QListWidget,
-    QListWidgetItem,
-    QPushButton,
-    QHBoxLayout,
-    QFileDialog,
-    QMessageBox,
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
+    QTableWidget, QTableWidgetItem, QHeaderView, QGroupBox,
+    QFileDialog, QMessageBox, QProgressBar
 )
-from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import Qt
+import os
 
 
 class UserProfileInterface(QWidget):
     def __init__(self, account_manager):
         super().__init__()
         self.account_manager = account_manager
-        self._setup_ui()
+        self._initialize_interface()
 
-    def _setup_ui(self):
+    def _initialize_interface(self):
         layout = QVBoxLayout()
-
-        title_label = QLabel("ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ")
-        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet(
-            "font-size: 18pt; font-weight: bold; margin: 10px;"
-        )
-        layout.addWidget(title_label)
-
-        top_container = QHBoxLayout()
-
-        self.avatar_container = QGroupBox("Аватарка")
-        avatar_layout = QVBoxLayout()
-
-        self.avatar_label = QLabel()
-        self.avatar_label.setFixedSize(150, 150)
-        self.avatar_label.setStyleSheet(
-            "border: 2px solid #ccc; border-radius: 5px;"
-        )
-        self.avatar_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        avatar_layout.addWidget(self.avatar_label)
-
-        avatar_buttons_layout = QHBoxLayout()
-
-        self.change_avatar_button = QPushButton("Изменить аватарку")
-        self.change_avatar_button.clicked.connect(self._change_avatar)
-        avatar_buttons_layout.addWidget(self.change_avatar_button)
-
-        self.remove_avatar_button = QPushButton("Удалить аватарку")
-        self.remove_avatar_button.clicked.connect(self._remove_avatar)
-        avatar_buttons_layout.addWidget(self.remove_avatar_button)
-
-        avatar_layout.addLayout(avatar_buttons_layout)
-        self.avatar_container.setLayout(avatar_layout)
-        top_container.addWidget(self.avatar_container)
-
-        user_info_group = QGroupBox("Основная информация")
-        info_layout = QGridLayout()
-
-        self.username_display = QLabel()
-        self.level_display = QLabel()
-        self.xp_display = QLabel()
-        self.xp_progress_indicator = QProgressBar()
-        self.streak_display = QLabel()
-        self.quizzes_count_display = QLabel()
-
-        info_layout.addWidget(QLabel("Имя пользователя:"), 0, 0)
-        info_layout.addWidget(self.username_display, 0, 1)
-        info_layout.addWidget(QLabel("Уровень:"), 1, 0)
-        info_layout.addWidget(self.level_display, 1, 1)
-        info_layout.addWidget(QLabel("Опыт:"), 2, 0)
-        info_layout.addWidget(self.xp_display, 2, 1)
-        info_layout.addWidget(QLabel("Прогресс уровня:"), 3, 0)
-        info_layout.addWidget(self.xp_progress_indicator, 3, 1)
-        info_layout.addWidget(QLabel("Текущая серия:"), 4, 0)
-        info_layout.addWidget(self.streak_display, 4, 1)
-        info_layout.addWidget(QLabel("Пройдено викторин:"), 5, 0)
-        info_layout.addWidget(self.quizzes_count_display, 5, 1)
-
-        user_info_group.setLayout(info_layout)
-        top_container.addWidget(user_info_group, 1)
-
-        layout.addLayout(top_container)
-
-        achievements_group = QGroupBox("Достижения")
-        achievements_layout = QVBoxLayout()
-
-        self.achievements_list_widget = QListWidget()
-        achievements_layout.addWidget(self.achievements_list_widget)
-
-        achievements_group.setLayout(achievements_layout)
-        layout.addWidget(achievements_group)
-
+        
+        self.profile_header = QLabel("ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ")
+        self.profile_header.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.profile_header.setStyleSheet("font-size: 16pt; font-weight: bold; margin: 10px;")
+        layout.addWidget(self.profile_header)
+        
+        self.profile_container = QWidget()
+        self.profile_layout = QVBoxLayout()
+        
+        self.user_info_section = self._create_user_info_section()
+        self.profile_layout.addWidget(self.user_info_section)
+        
+        self.avatar_section = self._create_avatar_section()
+        self.profile_layout.addWidget(self.avatar_section)
+        
+        self.achievements_section = self._create_achievements_section()
+        self.profile_layout.addWidget(self.achievements_section)
+        
+        self.quiz_history_section = self._create_quiz_history_section()
+        self.profile_layout.addWidget(self.quiz_history_section)
+        
+        self.profile_container.setLayout(self.profile_layout)
+        layout.addWidget(self.profile_container)
+        
         self.setLayout(layout)
+
+    def _create_user_info_section(self):
+        section = QGroupBox("Информация о пользователе")
+        layout = QVBoxLayout()
+        
+        self.username_label = QLabel("Имя пользователя: ")
+        self.user_level_label = QLabel("Уровень: ")
+        self.user_xp_label = QLabel("Опыт: ")
+        self.registration_label = QLabel("Дата регистрации: ")
+        self.streak_label = QLabel("Текущая серия правильных ответов: ")
+        self.max_streak_label = QLabel("Максимальная серия: ")
+        
+        layout.addWidget(self.username_label)
+        layout.addWidget(self.user_level_label)
+        layout.addWidget(self.user_xp_label)
+        layout.addWidget(self.registration_label)
+        layout.addWidget(self.streak_label)
+        layout.addWidget(self.max_streak_label)
+        
+        section.setLayout(layout)
+        return section
+
+    def _create_avatar_section(self):
+        section = QGroupBox("Аватарка")
+        layout = QVBoxLayout()
+        
+        self.avatar_label = QLabel()
+        self.avatar_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.avatar_label.setFixedSize(150, 150)
+        self.avatar_label.setStyleSheet("border: 2px solid #ccc; border-radius: 75px;")
+        
+        button_layout = QHBoxLayout()
+        self.change_avatar_button = QPushButton("Изменить аватар")
+        self.change_avatar_button.clicked.connect(self._change_avatar)
+        self.remove_avatar_button = QPushButton("Удалить аватар")
+        self.remove_avatar_button.clicked.connect(self._remove_avatar)
+        
+        button_layout.addWidget(self.change_avatar_button)
+        button_layout.addWidget(self.remove_avatar_button)
+        
+        layout.addWidget(self.avatar_label, 0, Qt.AlignmentFlag.AlignCenter)
+        layout.addLayout(button_layout)
+        
+        section.setLayout(layout)
+        return section
+
+    def _create_achievements_section(self):
+        section = QGroupBox("Достижения")
+        layout = QVBoxLayout()
+        
+        self.achievements_table = QTableWidget()
+        self.achievements_table.setColumnCount(3)
+        self.achievements_table.setHorizontalHeaderLabels(["Название", "Описание", "Дата получения"])
+        self.achievements_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.achievements_table.setMaximumHeight(200)
+        
+        layout.addWidget(self.achievements_table)
+        section.setLayout(layout)
+        return section
+
+    def _create_quiz_history_section(self):
+        section = QGroupBox("История викторин")
+        layout = QVBoxLayout()
+        
+        self.quiz_history_table = QTableWidget()
+        self.quiz_history_table.setColumnCount(7)
+        self.quiz_history_table.setHorizontalHeaderLabels([
+            "Дата", "Название", "Вопросы", "Правильно", 
+            "Баллы", "Время (сек)", "Опыт"
+        ])
+        self.quiz_history_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.quiz_history_table.setMaximumHeight(250)
+        
+        layout.addWidget(self.quiz_history_table)
+        section.setLayout(layout)
+        return section
 
     def refresh_profile_data(self):
         if not self.account_manager.current_user:
+            self._clear_profile_data()
             return
-
-        current_user = self.account_manager.current_user
-
-        self.username_display.setText(current_user.user_name)
-        self.level_display.setText(f"{current_user.user_level}")
-        self.xp_display.setText(f"{current_user.accumulated_experience} XP")
-
-        current_level_xp = (
-            current_user.accumulated_experience
-            - ((current_user.user_level - 1) * 1000)
-        )
-        progress_percentage = (current_level_xp / 1000) * 100
-        self.xp_progress_indicator.setValue(int(progress_percentage))
-
-        streak_text = (
-            f"{current_user.correct_streak} "
-            f"(рекорд: {current_user.maximum_streak})"
-        )
-        self.streak_display.setText(streak_text)
-        self.quizzes_count_display.setText(
-            f"{len(current_user.quiz_records)}"
-        )
-
-        self._load_user_avatar(current_user.user_name)
-
-        self.achievements_list_widget.clear()
-        for achievement_record in current_user.obtained_achievements:
-            item_text = (
-                f"✓ {achievement_record['name']} "
-                f"({achievement_record['unlock_date']})"
-            )
-            list_item = QListWidgetItem(item_text)
-            self.achievements_list_widget.addItem(list_item)
-
-    def _load_user_avatar(self, username):
+        
+        user = self.account_manager.current_user
+        
+        self.username_label.setText(f"Имя пользователя: {user.user_name}")
+        self.user_level_label.setText(f"Уровень: {user.user_level}")
+        self.user_xp_label.setText(f"Опыт: {user.accumulated_experience}")
+        self.registration_label.setText(f"Дата регистрации: {user.registration_date}")
+        self.streak_label.setText(f"Текущая серия правильных ответов: {user.correct_streak}")
+        self.max_streak_label.setText(f"Максимальная серия: {user.maximum_streak}")
+        
+        # Исправленный путь к аватару
         try:
-            avatar_path = self.account_manager.get_user_avatar_path(
-                username
-            )
-            pixmap = QPixmap(avatar_path)
-
-            if pixmap.isNull():
-                pixmap = QPixmap(150, 150)
-                pixmap.fill(Qt.GlobalColor.lightGray)
-
-            pixmap = pixmap.scaled(
-                150,
-                150,
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation
-            )
-            self.avatar_label.setPixmap(pixmap)
+            avatar_path = self.account_manager.get_user_avatar_path(user.user_name)
+            if os.path.exists(avatar_path):
+                pixmap = QPixmap(avatar_path)
+                pixmap = pixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                self.avatar_label.setPixmap(pixmap)
+            else:
+                self.avatar_label.clear()
+                self.avatar_label.setText("Аватар\nне выбран")
+                self.avatar_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         except Exception as e:
-            print(f"Ошибка загрузки аватарки: {e}")
-            pixmap = QPixmap(150, 150)
-            pixmap.fill(Qt.GlobalColor.lightGray)
-            self.avatar_label.setPixmap(pixmap)
+            print(f"Ошибка загрузки аватара: {e}")
+            self.avatar_label.clear()
+            self.avatar_label.setText("Ошибка\nзагрузки")
+            self.avatar_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        self._load_achievements()
+        self._load_quiz_history()
+
+    def _clear_profile_data(self):
+        self.username_label.setText("Имя пользователя: ")
+        self.user_level_label.setText("Уровень: ")
+        self.user_xp_label.setText("Опыт: ")
+        self.registration_label.setText("Дата регистрации: ")
+        self.streak_label.setText("Текущая серия правильных ответов: ")
+        self.max_streak_label.setText("Максимальная серия: ")
+        
+        self.avatar_label.clear()
+        self.avatar_label.setText("Аватар\nне выбран")
+        self.avatar_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        self.achievements_table.setRowCount(0)
+        self.quiz_history_table.setRowCount(0)
+
+    def _load_achievements(self):
+        achievements = self.account_manager.get_user_achievements()
+        self.achievements_table.setRowCount(len(achievements))
+        
+        for row, achievement in enumerate(achievements):
+            self.achievements_table.setItem(row, 0, QTableWidgetItem(achievement['name']))
+            self.achievements_table.setItem(row, 1, QTableWidgetItem(achievement['description']))
+            self.achievements_table.setItem(row, 2, QTableWidgetItem(achievement['unlock_date']))
+
+    def _load_quiz_history(self):
+        quiz_history = self.account_manager.get_user_quiz_history(10)
+        self.quiz_history_table.setRowCount(len(quiz_history))
+        
+        for row, quiz in enumerate(quiz_history):
+            self.quiz_history_table.setItem(row, 0, QTableWidgetItem(quiz['completed_date']))
+            self.quiz_history_table.setItem(row, 1, QTableWidgetItem(quiz['quiz_title']))
+            self.quiz_history_table.setItem(row, 2, QTableWidgetItem(str(quiz['total_questions'])))
+            self.quiz_history_table.setItem(row, 3, QTableWidgetItem(str(quiz['correct_responses'])))
+            self.quiz_history_table.setItem(row, 4, QTableWidgetItem(f"{quiz['final_score']}/{quiz['maximum_score']}"))
+            self.quiz_history_table.setItem(row, 5, QTableWidgetItem(str(quiz['time_elapsed_seconds'])))
+            self.quiz_history_table.setItem(row, 6, QTableWidgetItem(str(quiz['experience_earned'])))
 
     def _change_avatar(self):
         if not self.account_manager.current_user:
-            QMessageBox.warning(
-                self,
-                "Ошибка",
-                "Необходимо войти в систему"
-            )
+            QMessageBox.warning(self, "Ошибка", "Сначала войдите в систему")
             return
-
-        username = self.account_manager.current_user.user_name
-
+        
         file_dialog = QFileDialog()
-        file_dialog.setWindowTitle(
-            "Выберите изображение для аватарки"
+        file_path, _ = file_dialog.getOpenFileName(
+            self,
+            "Выберите изображение",
+            "",
+            "Images (*.png *.jpg *.jpeg *.bmp *.gif)"
         )
-        file_filter = "Изображения (*.png *.jpg *.jpeg *.bmp *.gif)"
-        file_dialog.setNameFilter(file_filter)
-        file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
-
-        if file_dialog.exec():
-            selected_files = file_dialog.selectedFiles()
-            if selected_files:
-                image_path = selected_files[0]
-
-                file_size = os.path.getsize(image_path)
-                max_size = 5 * 1024 * 1024  # 5 МБ
-                if file_size > max_size:
-                    QMessageBox.warning(
-                        self,
-                        "Ошибка",
-                        "Файл слишком большой. Максимальный размер - 5 МБ."
-                    )
-                    return
-
-                success, message = (
-                    self.account_manager.save_user_avatar(
-                        username,
-                        image_path
-                    )
-                )
-
-                if success:
-                    QMessageBox.information(self, "Успех", message)
-                    self._load_user_avatar(username)
-                else:
-                    QMessageBox.warning(self, "Ошибка", message)
+        
+        if file_path:
+            username = self.account_manager.current_user.user_name
+            success, message = self.account_manager.save_user_avatar(username, file_path)
+            
+            if success:
+                QMessageBox.information(self, "Успех", message)
+                self.refresh_profile_data()
+            else:
+                QMessageBox.warning(self, "Ошибка", message)
 
     def _remove_avatar(self):
         if not self.account_manager.current_user:
-            QMessageBox.warning(
-                self,
-                "Ошибка",
-                "Необходимо войти в систему"
-            )
+            QMessageBox.warning(self, "Ошибка", "Сначала войдите в систему")
             return
-
-        username = self.account_manager.current_user.user_name
-
+        
         reply = QMessageBox.question(
             self,
             "Подтверждение",
             "Вы уверены, что хотите удалить аватарку?",
-            QMessageBox.StandardButton.Yes
-            | QMessageBox.StandardButton.No
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
         )
-
+        
         if reply == QMessageBox.StandardButton.Yes:
-            success, message = (
-                self.account_manager.remove_user_avatar(username)
-            )
-
+            username = self.account_manager.current_user.user_name
+            success, message = self.account_manager.remove_user_avatar(username)
+            
             if success:
                 QMessageBox.information(self, "Успех", message)
-                self._load_user_avatar(username)
+                self.refresh_profile_data()
             else:
                 QMessageBox.warning(self, "Ошибка", message)

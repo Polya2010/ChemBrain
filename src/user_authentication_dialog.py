@@ -1,59 +1,112 @@
 from PyQt6.QtWidgets import (
-    QDialog,
-    QVBoxLayout,
-    QFormLayout,
-    QLineEdit,
-    QPushButton,
-    QHBoxLayout,
-    QLabel,
+    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, 
+    QPushButton, QMessageBox, QFormLayout
 )
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QFont
 
 
 class LoginDialog(QDialog):
-    def __init__(self, account_manager):
-        super().__init__()
+    def __init__(self, account_manager, parent=None):
+        super().__init__(parent)
         self.account_manager = account_manager
         self.setWindowTitle("ChemBrain - Авторизация")
         self.setModal(True)
+        self.setFixedSize(400, 200)
         self._create_interface()
 
     def _create_interface(self):
-        dialog_layout = QVBoxLayout()
-
-        form_section = QFormLayout()
-
+        layout = QVBoxLayout(self)
+        layout.setSpacing(15)
+        
+        title_label = QLabel("ChemBrain - Обучение химии")
+        title_label.setFont(QFont("Arial", 16, QFont.Weight.Bold))
+        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title_label.setStyleSheet("color: #2c3e50; margin-bottom: 10px;")
+        layout.addWidget(title_label)
+        
+        form_layout = QFormLayout()
+        form_layout.setSpacing(10)
+        
         self.username_field = QLineEdit()
-        self.username_field.setPlaceholderText(
-            "Введите имя пользователя"
-        )
-        form_section.addRow("Имя пользователя:", self.username_field)
-
-        dialog_layout.addLayout(form_section)
-
-        button_section = QHBoxLayout()
-
-        self.login_button = QPushButton("Войти")
-        self.login_button.clicked.connect(self._perform_login)
-        button_section.addWidget(self.login_button)
-
-        self.register_button = QPushButton("Регистрация")
-        self.register_button.clicked.connect(self._perform_registration)
-        button_section.addWidget(self.register_button)
-
-        self.exit_button = QPushButton("Выйти")
-        self.exit_button.setStyleSheet(
-            "background-color: #ff6666; color: white;"
-        )
-        self.exit_button.clicked.connect(self.reject)
-        button_section.addWidget(self.exit_button)
-
-        dialog_layout.addLayout(button_section)
-
+        self.username_field.setPlaceholderText("Введите имя пользователя")
+        self.username_field.setStyleSheet("""
+            QLineEdit {
+                padding: 8px;
+                border: 1px solid #bdc3c7;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+            QLineEdit:focus {
+                border-color: #3498db;
+            }
+        """)
+        form_layout.addRow("👤 Имя пользователя:", self.username_field)
+        
+        layout.addLayout(form_layout)
+        
+        buttons_layout = QHBoxLayout()
+        
+        login_button = QPushButton("Войти")
+        login_button.setStyleSheet("""
+            QPushButton {
+                background-color: #2ecc71;
+                color: white;
+                font-weight: bold;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-size: 14px;
+                border: none;
+            }
+            QPushButton:hover {
+                background-color: #27ae60;
+            }
+        """)
+        login_button.clicked.connect(self._perform_login)
+        buttons_layout.addWidget(login_button)
+        
+        register_button = QPushButton("Регистрация")
+        register_button.setStyleSheet("""
+            QPushButton {
+                background-color: #3498db;
+                color: white;
+                font-weight: bold;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-size: 14px;
+                border: none;
+            }
+            QPushButton:hover {
+                background-color: #2980b9;
+            }
+        """)
+        register_button.clicked.connect(self._perform_registration)
+        buttons_layout.addWidget(register_button)
+        
+        exit_button = QPushButton("Выйти")
+        exit_button.setStyleSheet("""
+            QPushButton {
+                background-color: #e74c3c;
+                color: white;
+                font-weight: bold;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-size: 14px;
+                border: none;
+            }
+            QPushButton:hover {
+                background-color: #c0392b;
+            }
+        """)
+        exit_button.clicked.connect(self.reject)
+        buttons_layout.addWidget(exit_button)
+        
+        layout.addLayout(buttons_layout)
+        
         self.status_message = QLabel("")
-        self.status_message.setStyleSheet("color: red;")
-        dialog_layout.addWidget(self.status_message)
-
-        self.setLayout(dialog_layout)
+        self.status_message.setStyleSheet("color: #e74c3c; font-size: 12px; margin-top: 5px;")
+        self.status_message.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.status_message)
 
     def _perform_login(self):
         input_username = self.username_field.text().strip()

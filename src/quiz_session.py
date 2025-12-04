@@ -30,7 +30,7 @@ class QuizAttempt:
             is_correct = active_question.check_answer(user_answer)
 
             if self.account_handler.current_user:
-                self.account_handler.current_user.update_streak_counter(
+                self.account_handler.update_streak_counter(
                     is_correct
                 )
 
@@ -111,7 +111,7 @@ class QuizAttempt:
             print(f"Общий полученный опыт: {self.experience_gained}")
 
             level_increased = (
-                self.account_handler.current_user.add_experience(
+                self.account_handler.add_experience(
                     int(self.experience_gained)
                 )
             )
@@ -139,7 +139,7 @@ class QuizAttempt:
 
             print(f"Данные викторины: {quiz_summary}")
 
-            self.account_handler.current_user.save_quiz_result(
+            self.account_handler.save_quiz_result(
                 quiz_summary
             )
 
@@ -156,8 +156,6 @@ class QuizAttempt:
             quiz_summary['unlocked_achievements'] = achievement_names
 
             print(f"Получено достижений: {len(unlocked_achievements)}")
-
-            self.account_handler.save_user_data()
 
             print("Викторина успешно завершена")
             return quiz_summary, unlocked_achievements, level_increased

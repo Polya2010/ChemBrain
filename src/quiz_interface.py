@@ -1,11 +1,26 @@
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton,
-    QLabel, QProgressBar, QRadioButton, QButtonGroup, QTextEdit,
-    QGroupBox, QComboBox, QMessageBox, QStackedWidget
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QGroupBox,
+    QRadioButton,
+    QButtonGroup,
+    QMessageBox,
+    QProgressBar,
+    QGridLayout,
+    QComboBox,
+    QSpinBox,
+    QFrame,
+    QTextEdit,
+    QDialog,
+    QScrollArea,
+    QSizePolicy,
 )
 from PyQt6.QtCore import Qt, QTimer
-import random
-from quiz_session import QuizAttempt
+from PyQt6.QtGui import QFont
+import time
 
 
 class QuizInteractionPanel(QWidget):
@@ -13,484 +28,731 @@ class QuizInteractionPanel(QWidget):
         super().__init__()
         self.questions_manager = questions_manager
         self.account_manager = account_manager
-        self.active_attempt = None
-        self.quiz_timer = QTimer()
-        self.quiz_timer.timeout.connect(self._update_time_display)
-        self.elapsed_seconds = 0
-        self._initialize_interface()
+        self.current_questions = []
+        self.current_question_index = 0
+        self.correct_answers = 0
+        self.quiz_start_time = None
+        self.user_answers = []
+        self._initialize_ui()
 
-    def _initialize_interface(self):
+    def _initialize_ui(self):
         main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setSpacing(15)
 
-        header_label = QLabel("ВИКТОРИНА ПО ХИМИИ")
-        header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        header_label.setStyleSheet(
-            "font-size: 16pt; font-weight: bold; margin: 10px;"
+        title_label = QLabel("🧪 Химическая викторина")
+        title_label.setFont(QFont("Arial", 24, QFont.Weight.Bold))
+        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title_label.setStyleSheet("color: #2c3e50; margin-bottom: 20px;")
+        main_layout.addWidget(title_label)
+
+        settings_group = QGroupBox("⚙️ Настройки викторины")
+        settings_group.setStyleSheet(
+            """
+            QGroupBox {
+                font-weight: bold;
+                border: 2px solid #3498db;
+                border-radius: 5px;
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+            QGroupBox::title {
+                color: #3498db;
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px 0 5px;
+            }
+        """
         )
-        main_layout.addWidget(header_label)
 
-        self.screen_container = QStackedWidget()
+        settings_layout = QGridLayout()
+        settings_layout.setSpacing(10)
 
-        self.selection_panel = self._create_selection_panel()
-        self.screen_container.addWidget(self.selection_panel)
+        cat_label = QLabel("📂 Категория:")
+        cat_label.setStyleSheet("font-weight: bold;")
+        settings_layout.addWidget(cat_label, 0, 0)
 
-        self.quiz_panel = self._create_quiz_panel()
-        self.screen_container.addWidget(self.quiz_panel)
+        self.category_combo = QComboBox()
+        self.category_combo.setStyleSheet(
+            """
+            QComboBox {
+                padding: 8px;
+                border: 1px solid #bdc3c7;
+                border-radius: 4px;
+                background-color: white;
+            }
+            QComboBox:hover {
+                border-color: #3498db;
+            }
+        """
+        )
+        self.category_combo.addItem("📁 Все категории", "all")
+        self.category_combo.addItem("⚛️ Элементы", "elements")
+        self.category_combo.addItem("🔬 Свойства", "properties")
+        self.category_combo.addItem("📜 История", "history")
+        self.category_combo.addItem("🏭 Применение", "application")
+        settings_layout.addWidget(self.category_combo, 0, 1)
 
-        self.results_panel = self._create_results_panel()
-        self.screen_container.addWidget(self.results_panel)
+        diff_label = QLabel("📈 Сложность:")
+        diff_label.setStyleSheet("font-weight: bold;")
+        settings_layout.addWidget(diff_label, 1, 0)
 
-        main_layout.addWidget(self.screen_container)
+        self.difficulty_combo = QComboBox()
+        self.difficulty_combo.setStyleSheet(
+            """
+            QComboBox {
+                padding: 8px;
+                border: 1px solid #bdc3c7;
+                border-radius: 4px;
+                background-color: white;
+            }
+            QComboBox:hover {
+                border-color: #3498db;
+            }
+        """
+        )
+        self.difficulty_combo.addItem("🎯 Любая", "all")
+        self.difficulty_combo.addItem("😊 Легкая", "easy")
+        self.difficulty_combo.addItem("😐 Средняя", "medium")
+        self.difficulty_combo.addItem("🤯 Сложная", "hard")
+        settings_layout.addWidget(self.difficulty_combo, 1, 1)
+
+        count_label = QLabel("❓ Количество вопросов:")
+        count_label.setStyleSheet("font-weight: bold;")
+        settings_layout.addWidget(count_label, 2, 0)
+
+        self.questions_combo = QComboBox()
+        self.questions_combo.setStyleSheet(
+            """
+            QComboBox {
+                padding: 8px;
+                border: 1px solid #bdc3c7;
+                border-radius: 4px;
+                background-color: white;
+            }
+            QComboBox:hover {
+                border-color: #3498db;
+            }
+        """
+        )
+        self.questions_combo.addItem("5 вопросов", 5)
+        self.questions_combo.addItem("10 вопросов", 10)
+        settings_layout.addWidget(self.questions_combo, 2, 1)
+
+        settings_group.setLayout(settings_layout)
+        main_layout.addWidget(settings_group)
+
+        self.start_button = QPushButton("🚀 Начать викторину")
+        self.start_button.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #2ecc71;
+                color: white;
+                font-weight: bold;
+                padding: 15px 30px;
+                border-radius: 8px;
+                border: none;
+                font-size: 16px;
+            }
+            QPushButton:hover {
+                background-color: #27ae60;
+            }
+            QPushButton:pressed {
+                background-color: #229954;
+            }
+            QPushButton:disabled {
+                background-color: #95a5a6;
+            }
+        """
+        )
+        self.start_button.clicked.connect(self._initiate_quiz)
+        main_layout.addWidget(self.start_button, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.question_area = QGroupBox("📝 Вопрос")
+        self.question_area.setVisible(False)
+        self.question_area.setStyleSheet(
+            """
+            QGroupBox {
+                font-weight: bold;
+                border: 2px solid #9b59b6;
+                border-radius: 5px;
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+            QGroupBox::title {
+                color: #9b59b6;
+            }
+        """
+        )
+
+        question_layout = QVBoxLayout()
+        question_layout.setSpacing(10)
+
+        self.question_info = QLabel("")
+        self.question_info.setStyleSheet(
+            "color: #7f8c8d; font-size: 12px; padding: 5px;"
+        )
+        question_layout.addWidget(self.question_info)
+
+        self.question_text = QLabel("")
+        self.question_text.setFont(QFont("Arial", 14))
+        self.question_text.setWordWrap(True)
+        self.question_text.setStyleSheet(
+            """
+            QLabel {
+                color: #2c3e50;
+                padding: 15px;
+                background-color: #f8f9fa;
+                border-radius: 5px;
+                border: 1px solid #e0e0e0;
+            }
+        """
+        )
+        question_layout.addWidget(self.question_text)
+
+        self.options_group = QButtonGroup()
+        self.options_group.setExclusive(True)
+        self.options_layout = QVBoxLayout()
+        self.options_layout.setSpacing(5)
+
+        self.option_buttons = []
+        for i in range(4):
+            radio = QRadioButton()
+            radio.setFont(QFont("Arial", 11))
+            radio.setStyleSheet(
+                """
+                QRadioButton {
+                    padding: 12px;
+                    margin: 3px;
+                    border-radius: 4px;
+                    background-color: white;
+                    border: 1px solid #ddd;
+                }
+                QRadioButton:hover {
+                    background-color: #f0f7ff;
+                    border-color: #3498db;
+                }
+                QRadioButton::indicator {
+                    width: 18px;
+                    height: 18px;
+                }
+            """
+            )
+            self.options_group.addButton(radio, i)
+            self.options_layout.addWidget(radio)
+            self.option_buttons.append(radio)
+
+        question_layout.addLayout(self.options_layout)
+
+        nav_layout = QHBoxLayout()
+
+        self.prev_button = QPushButton("⬅️ Назад")
+        self.prev_button.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #3498db;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #2980b9;
+            }
+            QPushButton:disabled {
+                background-color: #bdc3c7;
+            }
+        """
+        )
+        self.prev_button.clicked.connect(self._previous_question)
+        self.prev_button.setEnabled(False)
+        nav_layout.addWidget(self.prev_button)
+
+        nav_layout.addStretch()
+
+        self.next_button = QPushButton("Далее ➡️")
+        self.next_button.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #2ecc71;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #27ae60;
+            }
+        """
+        )
+        self.next_button.clicked.connect(self._next_question)
+        nav_layout.addWidget(self.next_button)
+
+        question_layout.addLayout(nav_layout)
+
+        self.question_area.setLayout(question_layout)
+        main_layout.addWidget(self.question_area)
+
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setTextVisible(True)
+        self.progress_bar.setStyleSheet(
+            """
+            QProgressBar {
+                border: 2px solid #ddd;
+                border-radius: 5px;
+                text-align: center;
+                height: 25px;
+                font-weight: bold;
+            }
+            QProgressBar::chunk {
+                background-color: #3498db;
+                border-radius: 3px;
+            }
+        """
+        )
+        self.progress_bar.setVisible(False)
+        main_layout.addWidget(self.progress_bar)
+
+        self.result_area = QGroupBox("🏆 Результат")
+        self.result_area.setVisible(False)
+        self.result_area.setStyleSheet(
+            """
+            QGroupBox {
+                font-weight: bold;
+                border: 2px solid #f39c12;
+                border-radius: 5px;
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+            QGroupBox::title {
+                color: #f39c12;
+            }
+        """
+        )
+
+        result_layout = QVBoxLayout()
+        result_layout.setSpacing(15)
+
+        self.result_text = QLabel("")
+        self.result_text.setFont(QFont("Arial", 12))
+        self.result_text.setWordWrap(True)
+        self.result_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.result_text.setStyleSheet("padding: 20px;")
+        result_layout.addWidget(self.result_text)
+
+        self.details_button = QPushButton("📊 Показать детали")
+        self.details_button.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #3498db;
+                color: white;
+                font-weight: bold;
+                padding: 12px 25px;
+                border-radius: 6px;
+                margin-top: 10px;
+            }
+            QPushButton:hover {
+                background-color: #2980b9;
+            }
+        """
+        )
+        self.details_button.clicked.connect(self._show_detailed_results)
+        self.details_button.setVisible(False)
+
+        self.restart_button = QPushButton("🔄 Пройти еще раз")
+        self.restart_button.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #2ecc71;
+                color: white;
+                font-weight: bold;
+                padding: 12px 25px;
+                border-radius: 6px;
+                margin-top: 10px;
+            }
+            QPushButton:hover {
+                background-color: #27ae60;
+            }
+        """
+        )
+        self.restart_button.clicked.connect(self._initiate_quiz)
+
+        result_layout.addWidget(
+            self.details_button, alignment=Qt.AlignmentFlag.AlignCenter
+        )
+        result_layout.addWidget(
+            self.restart_button, alignment=Qt.AlignmentFlag.AlignCenter
+        )
+
+        self.result_area.setLayout(result_layout)
+        main_layout.addWidget(self.result_area)
+
+        main_layout.addStretch()
         self.setLayout(main_layout)
 
-        self._display_selection_panel()
+    def _initiate_quiz(self):
+        if not self.account_manager.current_user:
+            QMessageBox.warning(
+                self, "Авторизация", "Для участия в викторине требуется вход в систему"
+            )
+            return
 
-    def _create_selection_panel(self):
-        panel_widget = QWidget()
-        panel_layout = QVBoxLayout()
+        category = self.category_combo.currentData()
+        difficulty = self.difficulty_combo.currentData()
+        questions_count = self.questions_combo.currentData()
+
+        self.current_questions = self.questions_manager.get_filtered_questions(
+            category, difficulty, questions_count
+        )
+
+        if not self.current_questions or len(self.current_questions) == 0:
+            QMessageBox.warning(
+                self,
+                "Ошибка",
+                "Не найдено вопросов по выбранным критериям!\nПопробуйте выбрать другие параметры.",
+            )
+            return
+
+        self.current_question_index = 0
+        self.correct_answers = 0
+        self.user_answers = [None] * len(self.current_questions)
+        self.quiz_start_time = time.time()
+
+        self.start_button.setVisible(False)
+        self.question_area.setVisible(True)
+        self.progress_bar.setVisible(True)
+        self.result_area.setVisible(False)
+        self.details_button.setVisible(False)
+
+        self.progress_bar.setMaximum(len(self.current_questions))
+        self.progress_bar.setValue(1)
+
+        self._display_current_question()
+
+    def _display_current_question(self):
+        if self.current_question_index >= len(self.current_questions):
+            return
+
+        question = self.current_questions[self.current_question_index]
+
+        question_info = f"📋 Вопрос {self.current_question_index + 1} из {len(self.current_questions)}"
+        question_info += f" | 📊 Сложность: {question.complexity_level}"
+        if hasattr(question, "categories") and question.categories:
+            question_info += f" | 📂 Категория: {', '.join(question.categories[:2])}"
+
+        self.question_info.setText(question_info)
+
+        self.question_text.setText(f"❓ {question.question_text}")
+
+        self.options_group.setExclusive(False)
+        for button in self.option_buttons:
+            button.setChecked(False)
+        self.options_group.setExclusive(True)
+
+        for i, button in enumerate(self.option_buttons):
+            if i < len(question.options):
+                button.setText(f"{chr(65 + i)}. {question.options[i]}")
+                button.setVisible(True)
+                if (
+                    self.user_answers[self.current_question_index]
+                    == question.options[i]
+                ):
+                    button.setChecked(True)
+            else:
+                button.setVisible(False)
+
+        self.prev_button.setEnabled(self.current_question_index > 0)
+
+        if self.current_question_index == len(self.current_questions) - 1:
+            self.next_button.setText("🏁 Завершить")
+        else:
+            self.next_button.setText("Далее ➡️")
+
+        self.progress_bar.setValue(self.current_question_index + 1)
+        self.progress_bar.setFormat(f"Прогресс: %v/%m (%p%)")
+
+    def _previous_question(self):
+        if self.current_question_index > 0:
+            self._save_current_answer()
+            self.current_question_index -= 1
+            self._display_current_question()
+
+    def _next_question(self):
+        self._save_current_answer()
+
+        if self.current_question_index < len(self.current_questions) - 1:
+            self.current_question_index += 1
+            self._display_current_question()
+        else:
+            self._finish_quiz()
+
+    def _save_current_answer(self):
+        checked_button = self.options_group.checkedButton()
+        if checked_button:
+            answer_text = checked_button.text()
+            if ". " in answer_text:
+                answer_text = answer_text.split(". ", 1)[1]
+            self.user_answers[self.current_question_index] = answer_text
+            return True
+        self.user_answers[self.current_question_index] = None
+        return False
+
+    def _finish_quiz(self):
+        self.correct_answers = 0
+        self.detailed_results = []
+
+        for i, question in enumerate(self.current_questions):
+            user_answer = self.user_answers[i]
+            is_correct = (
+                user_answer == question.correct_answer if user_answer else False
+            )
+            if is_correct:
+                self.correct_answers += 1
+
+            self.detailed_results.append(
+                {
+                    "question": question.question_text,
+                    "user_answer": user_answer,
+                    "correct_answer": question.correct_answer,
+                    "is_correct": is_correct,
+                    "explanation": question.explanation,
+                }
+            )
+
+        quiz_time = time.time() - self.quiz_start_time
+        minutes = int(quiz_time // 60)
+        seconds = int(quiz_time % 60)
+
+        percentage = (
+            (self.correct_answers / len(self.current_questions)) * 100
+            if self.current_questions
+            else 0
+        )
+
+        result_text = f"""
+        <div style='text-align: center;'>
+            <h2 style='color: #2c3e50;'>🏆 Викторина завершена!</h2>
+            <p style='font-size: 16px;'><b>📊 Правильных ответов:</b> {self.correct_answers} из {len(self.current_questions)}</p>
+            <p style='font-size: 16px;'><b>📈 Процент правильных ответов:</b> {percentage:.1f}%</p>
+            <p style='font-size: 16px;'><b>⏱️ Затраченное время:</b> {minutes} мин {seconds} сек</p>
+        """
+
+        if percentage == 100:
+            result_text += "<p style='color: #27ae60; font-size: 18px; font-weight: bold;'>🎉 Отлично! Идеальный результат!</p>"
+        elif percentage >= 80:
+            result_text += "<p style='color: #27ae60; font-size: 16px;'>👍 Отличный результат!</p>"
+        elif percentage >= 60:
+            result_text += "<p style='color: #f39c12; font-size: 16px;'>👌 Хороший результат!</p>"
+        elif percentage >= 40:
+            result_text += "<p style='color: #e67e22; font-size: 16px;'>😐 Можно лучше!</p>"
+        else:
+            result_text += "<p style='color: #e74c3c; font-size: 16px;'>📚 Попробуйте еще раз!</p>"
+
+        result_text += "</div>"
+        self.result_text.setText(result_text)
+
+        quiz_result = {
+            "quiz_title": "Химическая викторина",
+            "total_questions": len(self.current_questions),
+            "correct_responses": self.correct_answers,
+            "final_score": int(percentage),
+            "maximum_score": 100,
+            "time_elapsed_seconds": int(quiz_time),
+            "experience_earned": self.correct_answers * 10,
+            "level_increased": False,
+        }
 
         if self.account_manager.current_user:
-            user_info_container = QGroupBox("Текущий пользователь")
-            user_info_layout = QHBoxLayout()
+            level_increased = self.account_manager.add_experience(
+                quiz_result["experience_earned"]
+            )
+            quiz_result["level_increased"] = level_increased
 
-            username = self.account_manager.current_user.user_name
-            userlevel = self.account_manager.current_user.user_level
-            userxp = self.account_manager.current_user.accumulated_experience
+            self.account_manager.save_quiz_result(quiz_result)
 
-            user_info_layout.addWidget(QLabel(f"Пользователь: {username}"))
-            user_info_layout.addWidget(QLabel(f"Уровень: {userlevel}"))
-            user_info_layout.addWidget(QLabel(f"XP: {userxp}"))
+            for i in range(len(self.current_questions)):
+                is_correct = (
+                    self.user_answers[i] == self.current_questions[i].correct_answer
+                )
+                self.account_manager.update_streak_counter(is_correct)
 
-            user_info_container.setLayout(user_info_layout)
-            panel_layout.addWidget(user_info_container)
+            new_achievements = self.account_manager.check_achievement_progress(
+                quiz_result
+            )
+            if new_achievements:
+                achievements_text = "🎖️ Новые достижения:\n\n"
+                for ach in new_achievements:
+                    achievements_text += f"• {ach['name']} - {ach['description']}\n"
+                QMessageBox.information(self, "🏆 Достижения", achievements_text)
 
-        settings_container = QGroupBox("Параметры викторины")
-        settings_grid = QGridLayout()
+        self.question_area.setVisible(False)
+        self.progress_bar.setVisible(False)
+        self.result_area.setVisible(True)
+        self.details_button.setVisible(True)
+        self.start_button.setVisible(True)
 
-        settings_grid.addWidget(QLabel("Тематика:"), 0, 0)
-        self.category_selector = QComboBox()
-        cat_items = ["Все", "Элементы", "Характеристики"]
-        self.category_selector.addItems(cat_items)
-        settings_grid.addWidget(self.category_selector, 0, 1)
+    def _show_detailed_results(self):
+        if not hasattr(self, "detailed_results"):
+            return
 
-        settings_grid.addWidget(QLabel("Сложность:"), 1, 0)
-        self.difficulty_selector = QComboBox()
-        diff_items = ["Любая", "Легкая", "Средняя", "Сложная"]
-        self.difficulty_selector.addItems(diff_items)
-        settings_grid.addWidget(self.difficulty_selector, 1, 1)
+        dialog = QDialog(self)
+        dialog.setWindowTitle("📊 Детальные результаты")
+        dialog.setMinimumSize(1000, 700)
 
-        settings_grid.addWidget(QLabel("Количество вопросов:"), 2, 0)
-        self.quantity_selector = QComboBox()
-        self.quantity_selector.addItems(["5", "10"])
-        settings_grid.addWidget(self.quantity_selector, 2, 1)
+        main_layout = QVBoxLayout(dialog)
 
-        settings_container.setLayout(settings_grid)
-        panel_layout.addWidget(settings_container)
-
-        control_buttons = QHBoxLayout()
-
-        self.start_quiz_button = QPushButton("Начать викторину")
-        self.start_quiz_button.setStyleSheet("font-size: 12pt; padding: 10px;")
-        self.start_quiz_button.clicked.connect(self._initiate_quiz)
-        control_buttons.addWidget(self.start_quiz_button)
-
-        panel_layout.addLayout(control_buttons)
-        panel_widget.setLayout(panel_layout)
-        return panel_widget
-
-    def _create_quiz_panel(self):
-        panel_widget = QWidget()
-        panel_layout = QVBoxLayout()
-
-        status_info = QHBoxLayout()
-
-        self.progress_indicator = QProgressBar()
-        self.progress_indicator.setMaximum(100)
-        status_info.addWidget(QLabel("Прогресс:"))
-        status_info.addWidget(self.progress_indicator)
-
-        self.score_display = QLabel("Очки: 0")
-        status_info.addWidget(self.score_display)
-
-        self.time_display = QLabel("Время: 00:00")
-        status_info.addWidget(self.time_display)
-
-        panel_layout.addLayout(status_info)
-
-        self.question_display = QLabel()
-        self.question_display.setWordWrap(True)
-        self.question_display.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.question_display.setStyleSheet("font-size: 12pt; margin: 15px;")
-        panel_layout.addWidget(self.question_display)
-
-        self.answers_container = QWidget()
-        self.answers_layout = QVBoxLayout()
-        self.answers_container.setLayout(self.answers_layout)
-        panel_layout.addWidget(self.answers_container)
-
-        navigation_controls = QHBoxLayout()
-
-        self.next_question_button = QPushButton("Следующий вопрос")
-        self.next_question_button.clicked.connect(self._proceed_to_next)
-        navigation_controls.addWidget(self.next_question_button)
-
-        self.finish_quiz_button = QPushButton("Завершить викторина")
-        self.finish_quiz_button.clicked.connect(self._complete_quiz)
-        navigation_controls.addWidget(self.finish_quiz_button)
-
-        panel_layout.addLayout(navigation_controls)
-
-        panel_widget.setLayout(panel_layout)
-        return panel_widget
-
-    def _create_results_panel(self):
-        panel_widget = QWidget()
-        panel_layout = QVBoxLayout()
-
-        self.results_header = QLabel("Результаты викторины")
-        self.results_header.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.results_header.setStyleSheet(
-            "font-size: 16pt; font-weight: bold; margin: 10px;"
+        title_label = QLabel("📊 Детальные результаты викторины")
+        title_label.setFont(QFont("Arial", 16, QFont.Weight.Bold))
+        title_label.setStyleSheet(
+            "color: #2c3e50; padding: 10px; text-align: center;"
         )
-        panel_layout.addWidget(self.results_header)
+        main_layout.addWidget(title_label)
 
-        self.results_summary = QLabel()
-        self.results_summary.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.results_summary.setStyleSheet("font-size: 12pt; margin: 10px;")
-        panel_layout.addWidget(self.results_summary)
+        stats_text = f"""
+        <div style='text-align: center; background-color: #f8f9fa; padding: 10px; border-radius: 5px;'>
+            <b>📊 Общая статистика:</b><br>
+            Правильных ответов: {self.correct_answers} из {len(self.detailed_results)}<br>
+            Процент правильных: {(self.correct_answers / len(self.detailed_results) * 100):.1f}%
+        </div>
+        """
+        stats_label = QLabel(stats_text)
+        stats_label.setFont(QFont("Arial", 11))
+        stats_label.setWordWrap(True)
+        main_layout.addWidget(stats_label)
 
-        self.detailed_results = QTextEdit()
-        self.detailed_results.setReadOnly(True)
-        panel_layout.addWidget(self.detailed_results)
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setStyleSheet("border: none;")
 
-        action_buttons = QHBoxLayout()
+        container = QWidget()
+        container_layout = QHBoxLayout(container)
+        container_layout.setSpacing(20)
+        container_layout.setContentsMargins(15, 15, 15, 15)
 
-        self.new_quiz_button = QPushButton("Новая викторина")
-        self.new_quiz_button.clicked.connect(self._display_selection_panel)
-        action_buttons.addWidget(self.new_quiz_button)
+        left_column = QWidget()
+        left_layout = QVBoxLayout(left_column)
+        left_layout.setSpacing(15)
 
-        panel_layout.addLayout(action_buttons)
+        right_column = QWidget()
+        right_layout = QVBoxLayout(right_column)
+        right_layout.setSpacing(15)
 
-        panel_widget.setLayout(panel_layout)
-        return panel_widget
+        half_count = len(self.detailed_results) // 2
+        if len(self.detailed_results) % 2 != 0:
+            half_count += 1
 
-    def _display_selection_panel(self):
-        self.screen_container.setCurrentWidget(self.selection_panel)
+        for i in range(half_count):
+            result = self.detailed_results[i]
+            question_widget = self._create_question_result_widget(i + 1, result)
+            left_layout.addWidget(question_widget)
 
-    def _initiate_quiz(self):
-        try:
-            if not self.account_manager.current_user:
-                QMessageBox.warning(
-                    self,
-                    "Ошибка",
-                    "Для участия в викторине требуется авторизация"
-                )
-                return
+        for i in range(half_count, len(self.detailed_results)):
+            result = self.detailed_results[i]
+            question_widget = self._create_question_result_widget(i + 1, result)
+            right_layout.addWidget(question_widget)
 
-            category_mapping = {
-                "Элементы": "elements",
-                "Характеристики": "properties",
-                "Все": "all",
-                "Любая": "all"
-            }
-            difficulty_mapping = {
-                "Легкая": "easy",
-                "Средняя": "medium",
-                "Сложная": "hard",
-                "Любая": "all",
-                "Все": "all"
-            }
+        left_layout.addStretch()
+        right_layout.addStretch()
 
-            selected_category = category_mapping.get(
-                self.category_selector.currentText(),
-                "all"
-            )
-            selected_difficulty = difficulty_mapping.get(
-                self.difficulty_selector.currentText(),
-                "all"
-            )
-            questions_amount = int(self.quantity_selector.currentText())
+        container_layout.addWidget(left_column)
+        container_layout.addWidget(right_column)
 
-            print(f"Параметры викторины: категория={selected_category}, "
-                  f"сложность={selected_difficulty}, "
-                  f"количество={questions_amount}")
+        scroll_area.setWidget(container)
 
-            question_list = self.questions_manager.get_filtered_questions(
-                selected_category,
-                selected_difficulty,
-                questions_amount
-            )
+        main_layout.addWidget(scroll_area)
 
-            if not question_list:
-                QMessageBox.warning(
-                    self,
-                    "Ошибка",
-                    "Вопросы по выбранным критериям не найдены!"
-                )
-                return
-
-            print(f"Подготовлено {len(question_list)} вопросов")
-
-            self.active_attempt = QuizAttempt(
-                "Химическая викторина",
-                question_list,
-                self.account_manager
-            )
-            self.elapsed_seconds = 0
-            self.quiz_timer.start(1000)
-
-            self._show_current_question()
-            self.screen_container.setCurrentWidget(self.quiz_panel)
-
-        except Exception as error:
-            print(f"Ошибка запуска викторины: {error}")
-            import traceback
-            traceback.print_exc()
-            QMessageBox.critical(
-                self,
-                "Ошибка",
-                f"Ошибка при запуске викторины: {str(error)}"
-            )
-
-    def _show_current_question(self):
-        try:
-            if not self.active_attempt:
-                return
-
-            current_question = self.active_attempt.get_active_question()
-            if not current_question:
-                self._complete_quiz()
-                return
-
-            progress_value = self.active_attempt.calculate_progress()
-            self.progress_indicator.setValue(int(progress_value))
-            score_text = f"Очки: {self.active_attempt.total_score}"
-            self.score_display.setText(score_text)
-
-            q_index = self.active_attempt.current_question_index + 1
-            q_text = current_question.question_text
-            question_text = f"Вопрос {q_index}: {q_text}"
-            self.question_display.setText(question_text)
-
-            self._clear_answer_options()
-
-            if current_question.question_type == "multiple_choice":
-                self._present_multiple_choice(current_question)
-        except Exception as error:
-            print(f"Ошибка отображения вопроса: {error}")
-
-    def _clear_answer_options(self):
-        for i in reversed(range(self.answers_layout.count())):
-            widget_item = self.answers_layout.itemAt(i).widget()
-            if widget_item:
-                widget_item.deleteLater()
-
-    def _present_multiple_choice(self, question_item):
-        self.answer_options_group = QButtonGroup(self)
-
-        answer_options = question_item.possible_answers.copy()
-        random.shuffle(answer_options)
-
-        for option_text in answer_options:
-            option_button = QRadioButton(str(option_text))
-            option_button.setStyleSheet("font-size: 11pt; padding: 8px;")
-            self.answers_layout.addWidget(option_button)
-            self.answer_options_group.addButton(option_button)
-
-        submit_button = QPushButton("Ответить")
-        submit_button.clicked.connect(self._process_selected_answer)
-        self.answers_layout.addWidget(submit_button)
-
-    def _process_selected_answer(self):
-        try:
-            selected_option = self.answer_options_group.checkedButton()
-            if selected_option:
-                user_answer = selected_option.text()
-                self.active_attempt.process_user_response(user_answer)
-
-                if self.active_attempt.completed:
-                    self._complete_quiz()
-                else:
-                    self._show_current_question()
-            else:
-                QMessageBox.warning(
-                    self,
-                    "Внимание",
-                    "Необходимо выбрать вариант ответа!"
-                )
-        except Exception as error:
-            print(f"Ошибка обработки ответа: {error}")
-            import traceback
-            traceback.print_exc()
-
-    def _proceed_to_next(self):
-        try:
-            if self.active_attempt:
-                if not self.answer_options_group.checkedButton():
-                    available_buttons = self.answer_options_group.buttons()
-                    if available_buttons:
-                        random.choice(available_buttons).setChecked(True)
-
-                selected_option = self.answer_options_group.checkedButton()
-                if selected_option:
-                    self._process_selected_answer()
-        except Exception as error:
-            print(f"Ошибка перехода: {error}")
-
-    def _complete_quiz(self):
-        try:
-            print("Завершение викторины...")
-            self.quiz_timer.stop()
-
-            if self.active_attempt and not self.active_attempt.completed:
-                print("Завершение оставшихся вопросов...")
-                while not self.active_attempt.completed:
-                    self.active_attempt.process_user_response("")
-
-                print("Финализация попытки...")
-                quiz_results, unlocked_achievements, level_increased = (
-                    self.active_attempt._finalize_quiz_attempt()
-                )
-                if quiz_results:
-                    self.active_attempt.quiz_results = quiz_results
-                    self.active_attempt.new_achievements = (
-                        unlocked_achievements
-                    )
-                    self.active_attempt.level_increased = level_increased
-                else:
-                    print("Ошибка: результаты викторины отсутствуют")
-
-            print("Отображение результатов...")
-            self._present_final_results()
-            self.screen_container.setCurrentWidget(self.results_panel)
-            print("Результаты отображены")
-
-        except Exception as error:
-            print(f"КРИТИЧЕСКАЯ ОШИБКА завершения: {error}")
-            import traceback
-            traceback.print_exc()
-            QMessageBox.critical(
-                self,
-                "Ошибка",
-                f"Ошибка завершения викторины: {str(error)}"
-            )
-
-    def _present_final_results(self):
-        try:
-            if not self.active_attempt:
-                print("Ошибка: активная попытка отсутствует")
-                return
-
-            current_attempt = self.active_attempt
-            max_score = 0
-            if current_attempt.question_set:
-                max_score = sum(
-                    q.score_value for q in current_attempt.question_set
-                )
-
-            success_percentage = 0
-            if max_score > 0:
-                success_percentage = (
-                    current_attempt.total_score / max_score
-                ) * 100
-
-            correct_count = 0
-            if current_attempt.answer_records:
-                correct_count = sum(
-                    1 for r in current_attempt.answer_records
-                    if r['answer_correct']
-                )
-
-            correct_answers_text = (
-                f"<p>Правильных ответов: {correct_count} из "
-                f"{current_attempt.question_count}</p>"
-            )
-            time_spent = int(current_attempt.get_time_elapsed())
-            time_text = f"<p>Затраченное время: {time_spent} секунд</p>"
-            xp_gained = int(current_attempt.experience_gained)
-            xp_text = f"<p>Полученный опыт: +{xp_gained} XP</p>"
-
-            summary_text = f"""
-            <h3>Викторина завершена!</h3>
-            {correct_answers_text}
-            <p>Набрано очков: {current_attempt.total_score} из {max_score}</p>
-            <p>Результативность: {success_percentage:.1f}%</p>
-            {time_text}
-            {xp_text}
+        close_button = QPushButton("Закрыть")
+        close_button.setStyleSheet(
             """
+            QPushButton {
+                background-color: #3498db;
+                color: white;
+                font-weight: bold;
+                padding: 12px 30px;
+                border-radius: 6px;
+                font-size: 14px;
+                margin-top: 10px;
+            }
+            QPushButton:hover {
+                background-color: #2980b9;
+            }
+        """
+        )
+        close_button.clicked.connect(dialog.accept)
+        main_layout.addWidget(close_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
-            user_has_leveled_up = (
-                hasattr(current_attempt, 'level_increased')
-                and current_attempt.level_increased
-                and self.account_manager.current_user
+        dialog.exec()
+
+    def _create_question_result_widget(self, question_num, result):
+        widget = QFrame()
+        widget.setFrameShape(QFrame.Shape.Box)
+        widget.setLineWidth(1)
+        widget.setStyleSheet(
+            """
+            QFrame {
+                background-color: #ffffff;
+                border: 2px solid #e0e0e0;
+                border-radius: 8px;
+                padding: 15px;
+            }
+            QFrame:hover {
+                border-color: #3498db;
+                background-color: #f8f9fa;
+            }
+        """
+        )
+
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(8)
+
+        status_text = "✅ Правильно" if result["is_correct"] else "❌ Неправильно"
+        status_color = "#27ae60" if result["is_correct"] else "#e74c3c"
+
+        header_text = f"<b><span style='color: #2c3e50;'>Вопрос {question_num}:</span> <span style='color: {status_color};'>{status_text}</span></b>"
+        header_label = QLabel(header_text)
+        header_label.setFont(QFont("Arial", 12, QFont.Weight.Bold))
+        header_label.setWordWrap(True)
+        layout.addWidget(header_label)
+
+        question_text = f"<span style='color: #34495e;'>{result['question']}</span>"
+        question_label = QLabel(question_text)
+        question_label.setFont(QFont("Arial", 10))
+        question_label.setWordWrap(True)
+        question_label.setStyleSheet("margin-top: 5px;")
+        layout.addWidget(question_label)
+
+        separator = QFrame()
+        separator.setFrameShape(QFrame.Shape.HLine)
+        separator.setStyleSheet("background-color: #ddd; margin: 10px 0;")
+        layout.addWidget(separator)
+
+        user_answer_text = (
+            result["user_answer"] if result["user_answer"] else "Нет ответа"
+        )
+        user_answer_color = "#27ae60" if result["is_correct"] else "#e74c3c"
+        user_answer_label = QLabel(
+            f"<b>Ваш ответ:</b> <span style='color: {user_answer_color};'>{user_answer_text}</span>"
+        )
+        user_answer_label.setFont(QFont("Arial", 10))
+        user_answer_label.setWordWrap(True)
+        layout.addWidget(user_answer_label)
+
+        correct_answer_label = QLabel(
+            f"<b>Правильный ответ:</b> <span style='color: #27ae60;'>{result['correct_answer']}</span>"
+        )
+        correct_answer_label.setFont(QFont("Arial", 10))
+        correct_answer_label.setWordWrap(True)
+        layout.addWidget(correct_answer_label)
+
+        if result["explanation"]:
+            explanation_label = QLabel(
+                f"<b>Пояснение:</b> <span style='color: #7f8c8d;'>{result['explanation']}</span>"
             )
-
-            if user_has_leveled_up:
-                level_msg = (
-                    f"🎉 Достигнут уровень "
-                    f"{self.account_manager.current_user.user_level}!"
-                )
-                summary_text += (
-                    f"<p style='color: green; font-weight: bold;'>"
-                    f"{level_msg}</p>"
-                )
-
-            has_new_achievements = (
-                hasattr(current_attempt, 'new_achievements')
-                and current_attempt.new_achievements
+            explanation_label.setFont(QFont("Arial", 9))
+            explanation_label.setWordWrap(True)
+            explanation_label.setStyleSheet(
+                "margin-top: 5px; padding: 8px; background-color: #f8f9fa; border-radius: 4px;"
             )
+            layout.addWidget(explanation_label)
 
-            if has_new_achievements:
-                achievements_text = (
-                    "<p style='color: blue;'><b>Новые достижения:</b></p><ul>"
-                )
-                for achievement_item in current_attempt.new_achievements:
-                    achievements_text += f"<li>{achievement_item['name']}</li>"
-                achievements_text += "</ul>"
-                summary_text += achievements_text
-
-            self.results_summary.setText(summary_text)
-
-            detailed_report = "<h4>Детализированные результаты:</h4><ul>"
-            if current_attempt.answer_records:
-                for idx, answer_record in enumerate(
-                    current_attempt.answer_records,
-                    1
-                ):
-                    is_correct = answer_record['answer_correct']
-                    status = "✓ Верно" if is_correct else "✗ Неверно"
-                    xp_info = ""
-                    if is_correct:
-                        xp_awarded = int(answer_record['experience_awarded'])
-                        xp_info = f" (+{xp_awarded} XP)"
-                    question_content = answer_record['question_content']
-                    user_response = answer_record['user_response']
-                    correct_response = answer_record['correct_response']
-                    color_style = "green" if is_correct else "red"
-                    color_text = f"<span style='color: {color_style}'>"
-                    detailed_report += f"""
-                    <li style="margin-bottom: 10px;">
-                        <b>Вопрос {idx}:</b> {question_content}<br>
-                        {color_text}
-                            {status}{xp_info}
-                        </span><br>
-                        Ваш ответ: {user_response}<br>
-                        Правильный ответ: {correct_response}
-                    </li>
-                    """
-            detailed_report += "</ul>"
-            self.detailed_results.setHtml(detailed_report)
-
-        except Exception as error:
-            print(f"Ошибка отображения результатов: {error}")
-            import traceback
-            traceback.print_exc()
-            error_msg = f"Ошибка отображения результатов: {str(error)}"
-            self.results_summary.setText(error_msg)
-
-    def _update_time_display(self):
-        self.elapsed_seconds += 1
-        minutes = self.elapsed_seconds // 60
-        seconds = self.elapsed_seconds % 60
-        time_text = f"Время: {minutes:02d}:{seconds:02d}"
-        self.time_display.setText(time_text)
+        return widget

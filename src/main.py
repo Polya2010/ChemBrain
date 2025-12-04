@@ -1,7 +1,11 @@
 import sys
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, current_dir)
+
 from PyQt6.QtWidgets import QApplication
 from chemistry_learning_app import ChemistryEducationApp
-
 
 def start_application():
     application_instance = QApplication(sys.argv)
@@ -9,7 +13,6 @@ def start_application():
     main_window_instance = ChemistryEducationApp()
     main_window_instance.show()
     sys.exit(application_instance.exec())
-
 
 if __name__ == '__main__':
     start_application()
